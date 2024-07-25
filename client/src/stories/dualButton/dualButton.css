@@ -1,0 +1,30 @@
+.dualButton {
+  width: 100%;
+  height: 60px;
+  border: 0;
+  box-shadow: rgba(0, 0, 0, 0.25) 0px 0px 4px 0px;
+  border-radius: 15px;
+  background-color: white;
+  cursor: pointer;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 15px;
+  padding: 18.5px 30px;
+  transition:
+    all,
+    ease-in 0.15s;
+}
+.dualButton:hover {
+  box-shadow: rgba(0, 0, 0, 0.25) 0px 0px 8px 2px;
+  transition:
+    all,
+    ease-in 0.15s;
+}
+.cancellation:hover {
+  box-shadow: rgba(0, 0, 0, 0.25) 0px 0px 4px 0px;
+}
+.choiceCancellation {
+  color: #53afa6;
+  text-decoration: underline;
+}

@@ -1,0 +1,28 @@
+.select {
+  width: 100%;
+  height: 50px;
+  padding: 5px;
+  box-shadow: rgba(0, 0, 0, 0.25) 0px 0px 4px 0px;
+  border-radius: 15px;
+  position: relative;
+}
+
+select {
+  appearance: none;
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  border: 3px solid #b1f5ef;
+  border-radius: 15px;
+  padding: 10px;
+  padding-right: 30px;
+  background-color: white;
+}
+
+.downArrow {
+  width: 16px;
+  height: 16px;
+  position: absolute;
+  right: 20px;
+  top: 22px;
+}

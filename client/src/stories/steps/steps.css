@@ -1,0 +1,33 @@
+.steps {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  gap: 50px;
+}
+
+.steps div {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 5px;
+  height: min-content;
+}
+
+.step {
+  font-size: 64px;
+}
+
+.stepText {
+  display: block;
+  width: min-content;
+}
+
+.activeStep {
+  color: #53afa6;
+}
+
+.arrow {
+  transform: rotate(90deg);
+  width: 75px;
+  height: 75px;
+}

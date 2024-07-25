@@ -1,0 +1,90 @@
+.appointment {
+  box-sizing: border-box;
+  height: 60px;
+  border: 0;
+  box-shadow: rgba(0, 0, 0, 0.25) 0px 0px 4px 0px;
+  border-radius: 15px;
+  background-color: white;
+  padding: 0px 30px;
+  overflow: hidden;
+  transition:
+    all,
+    ease-in 0.15s;
+  position: relative;
+}
+
+.miniCard {
+  height: 60px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.miniCard::after {
+  content: "";
+  position: absolute;
+  width: 1px;
+  left: 50%;
+  top: 60px;
+  height: 2px;
+  background-color: #b1f5ef;
+  transition:
+    all,
+    ease-in 0.15s;
+}
+
+.opened .miniCard::after {
+  transform-origin: center;
+  transform: scaleX(1000);
+  transition:
+    all,
+    ease-in 0.3s 0.15s;
+}
+
+.opened {
+  height: 360px;
+  transition:
+    all,
+    ease-in 0.15s;
+}
+
+.doctorImg {
+  width: 200px;
+  height: 232px;
+  border: 3px solid #b1f5ef;
+  box-sizing: border-box;
+  border-radius: 15px;
+}
+
+.infoCard {
+  width: 100%;
+  height: 300px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 20px;
+}
+
+.infoContainer {
+  width: 100% - 220px;
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+.wrapper {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+}
+
+.appointmentDownArrow {
+  width: 16px;
+  height: 16px;
+}
+
+.opened .appointmentDownArrow {
+  transform: rotate(180deg);
+}
