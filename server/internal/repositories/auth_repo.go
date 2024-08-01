@@ -44,6 +44,7 @@ func (repo AuthRepository) IsUserExists(role, login string) error {
 	var user models.User
 
 	err := repo.db.QueryRow(fmt.Sprintf(GET_USER_BY_LOGIN, role), login).Scan(&user.Id, &user.Login, &user.Password)
+	
 	if err != nil {
 		return custom_errors.ErrUnexistingLogin
 	}
