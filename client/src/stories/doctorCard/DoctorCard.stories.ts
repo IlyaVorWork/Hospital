@@ -22,7 +22,9 @@ type Story = StoryObj<typeof meta>;
 // More on writing stories with args: https://storybook.js.org/docs/writing-stories/args
 export const Default: Story = {
   args: {
+    id: 1,
     doctorName: "Иванов И. И.",
     ticketCount: 99,
+    url: "https://i.ibb.co/FmyRhkh/Doctor5.jpg",
   },
 };

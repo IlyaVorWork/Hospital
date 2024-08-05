@@ -37,6 +37,7 @@ const LoginPage = () => {
     onSuccess: (res) => {
       setAccessToken("Access_token", res.data["Access_token"]);
       console.log(accessToken);
+      navigate("/assign");
     },
   });
 

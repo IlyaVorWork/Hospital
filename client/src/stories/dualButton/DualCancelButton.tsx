@@ -15,7 +15,11 @@ export interface DualCancelButtonProps {
 /**
  * Primary UI component for user interaction
  */
-const DualButton = ({ choice, onClick, ...props }: DualCancelButtonProps) => {
+const DualCancelButton = ({
+  choice,
+  onClick,
+  ...props
+}: DualCancelButtonProps) => {
   return (
     <button
       className="dualButton cancellation"
@@ -30,4 +34,4 @@ const DualButton = ({ choice, onClick, ...props }: DualCancelButtonProps) => {
   );
 };
 
-export default DualButton;
+export default DualCancelButton;

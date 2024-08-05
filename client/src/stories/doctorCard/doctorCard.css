@@ -1,6 +1,6 @@
 .card {
   width: 250px;
-  height: 325px;
+  height: 350px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -8,6 +8,9 @@
   box-shadow: rgba(0, 0, 0, 0.25) 0px 0px 4px 0px;
   border-radius: 15px;
   padding: 25px 0px;
+  transition:
+    all,
+    ease-in 0.15s;
 }
 
 .doctorImg {
@@ -16,4 +19,12 @@
   border: 3px solid #b1f5ef;
   box-sizing: border-box;
   border-radius: 15px;
+}
+
+.card:hover {
+  box-shadow: rgba(0, 0, 0, 0.25) 0px 0px 8px 2px;
+  cursor: pointer;
+  transition:
+    all,
+    ease-in 0.15s;
 }

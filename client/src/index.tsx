@@ -9,6 +9,7 @@ import {
 import { QueryClient, QueryClientProvider } from "react-query";
 import LoginPage from "./LoginPage";
 import { Cookies, CookiesProvider } from "react-cookie";
+import AssignPage from "./AssignPage";
 
 const queryClient = new QueryClient();
 const cookies = new Cookies();
@@ -29,6 +30,10 @@ const router = createBrowserRouter([
   {
     path: "/login",
     element: <LoginPage />,
+  },
+  {
+    path: "/assign",
+    element: <AssignPage />,
   },
 ]);
 
