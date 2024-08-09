@@ -13,13 +13,14 @@
   padding: 18.5px 30px;
   transition:
     all,
-    ease-in 0.15s;
+    ease 0.25s;
+  scroll-snap-align: center;
 }
 .dualButton:hover {
   box-shadow: rgba(0, 0, 0, 0.25) 0px 0px 8px 2px;
   transition:
     all,
-    ease-in 0.15s;
+    ease 0.25s;
 }
 .cancellation:hover {
   box-shadow: rgba(0, 0, 0, 0.25) 0px 0px 4px 0px;

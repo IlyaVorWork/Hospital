@@ -16,6 +16,7 @@ type AuthServiceInterface interface {
 	Login(loginData models.LoginDTO) (string, error)
 	Register(patient models.RegisterDTO) error
 	GetPatientData(id int) (models.Patient, error)
+	ChangePassword(patient_id int, password string) error
 }
 
 type AuthHandler struct {
@@ -98,7 +99,7 @@ func (handler *AuthHandler) Login(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"Access_token": token})
 }
 
-func (handler *AuthHandler) GetUserData(c *gin.Context) {
+func (handler *AuthHandler) GetPatientData(c *gin.Context) {
 
 	tokenClaims, err := VerifyToken(c, "patient")
 	if err != nil {
@@ -112,5 +113,29 @@ func (handler *AuthHandler) GetUserData(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"PatientData": patientData})
+	c.JSON(http.StatusOK, gin.H{"patient_data": patientData})
+}
+
+func (handler *AuthHandler) ChangePassword(c *gin.Context) {
+
+	tokenClaims, err := VerifyToken(c, "patient")
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"Error": err.Error()})
+		return
+	}
+
+	var queryData models.ChangePasswordDTO
+	err = c.ShouldBindJSON(&queryData)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"Error": err.Error()})
+		return
+	}
+
+	err = handler.service.ChangePassword(tokenClaims.Id, queryData.Password)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"Error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"Result": "success"})
 }

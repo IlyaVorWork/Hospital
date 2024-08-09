@@ -1,0 +1,20 @@
+.loader {
+  width: 50px;
+  padding: 8px;
+  align-content: center;
+  aspect-ratio: 1;
+  border-radius: 100%;
+  background: #b1f5ef;
+  --gradient: conic-gradient(#0000 5%, #000),
+    linear-gradient(#000000 0 0) content-box;
+  -webkit-mask: var(--gradient);
+  mask: var(--gradient);
+  -webkit-mask-composite: source-out;
+  mask-composite: subtract;
+  animation: l3 1s infinite linear;
+}
+@keyframes l3 {
+  to {
+    transform: rotate(1turn);
+  }
+}

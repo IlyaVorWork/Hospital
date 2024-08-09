@@ -6,6 +6,13 @@ import (
 	"github.com/dgrijalva/jwt-go"
 )
 
+type TokenClaims struct {
+	Id int `json:"id"`
+	Login string   `json:"login"`
+	Role string `json:"role"`
+	jwt.StandardClaims
+}
+
 type Patient struct {
 	Id          int       `json:"id"`
 	Login       string    `json:"login"`
@@ -24,7 +31,7 @@ type Patient struct {
 type User struct {
 	Id          int       `json:"id"`
 	Login       string    `json:"login"`
-	Password string `json:"password"`
+	Password	string    `json:"password"`
 }
 
 type LoginDTO struct {
@@ -48,9 +55,6 @@ type RegisterDTO struct {
 	Snils_number int `json:"snils_number"`
 }
 
-type TokenClaims struct {
-	Id int `json:"id"`
-	Login string   `json:"login"`
-	Role string `json:"role"`
-	jwt.StandardClaims
+type ChangePasswordDTO struct {
+	Password string `json:"password"`
 }

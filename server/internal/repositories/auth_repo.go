@@ -14,6 +14,7 @@ var (
 	GET_USER_BY_LOGIN = "SELECT id, login, password FROM public.%s WHERE login = $1"
 	GET_PATIENT_BY_ID = "SELECT id, login, password FROM public.patient WHERE id = $1"
 	REGISTER = "INSERT INTO public.patient(login, password, last_name, first_name, second_name, birth_date, sex_id, passport_series, passport_number, issue_date, issuer, snils_number) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)"
+	CHANGE_PASSWORD = "UPDATE public.patient SET password=$1 WHERE id = $2"
 )
 
 type AuthRepository struct{
@@ -73,6 +74,17 @@ func (repo AuthRepository) Register(patient models.RegisterDTO, passHash []byte)
 	_, err := repo.db.Exec(REGISTER, patient.Login, passHash, patient.Last_name, patient.First_name, patient.Second_name, 
 									 patient.Birth_date, patient.Sex_id, patient.Passport_series, patient.Passport_number, 
 									 patient.Issue_date, patient.Issuer, patient.Snils_number)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (repo AuthRepository) ChangePassword(patient_id int, passHash []byte) error {
+	
+	_, err := repo.db.Exec(CHANGE_PASSWORD, passHash, patient_id)
 
 	if err != nil {
 		return err

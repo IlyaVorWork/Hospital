@@ -15,6 +15,7 @@ type AuthRepositoryInterface interface {
 	IsUserExists(role, login string) error
 	Login(loginData models.LoginDTO) (models.User, error)
 	Register(user models.RegisterDTO, password []byte) error
+	ChangePassword(patient_id int, passHash []byte) error
 }
 
 type AuthService struct {
@@ -82,4 +83,19 @@ func (service AuthService) GetPatientData(id int) (models.Patient, error) {
 	}
 
 	return userData, nil
+}
+
+func (service AuthService) ChangePassword(patient_id int, password string) error {
+	
+	passHash, err := bcrypt.GenerateFromPassword([]byte(password), 14)
+	if err != nil {
+		return err
+	}
+
+	err = service.repo.ChangePassword(patient_id, passHash)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

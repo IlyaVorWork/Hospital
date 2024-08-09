@@ -39,7 +39,12 @@ const Input = ({ type, placeholder, onChange, ...props }: InputProps) => {
       case "date":
         return (
           <div className="input">
-            <input type="date" placeholder={placeholder} onChange={onChange} />
+            <input
+              type="date"
+              placeholder={placeholder}
+              onChange={onChange}
+              //min={new Date().toISOString().split("T")[0]}
+            />
           </div>
         );
       case "email":

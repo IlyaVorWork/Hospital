@@ -67,7 +67,7 @@
 }
 
 .infoContainer {
-  width: 100% - 220px;
+  width: calc(100% - 220px);
   display: flex;
   flex-direction: column;
   gap: 25px;

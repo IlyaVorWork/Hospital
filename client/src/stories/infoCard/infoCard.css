@@ -1,0 +1,12 @@
+.info {
+  width: 100%;
+  padding: 15px 0px;
+  box-shadow: rgba(0, 0, 0, 0.25) 0px 0px 4px 0px;
+  border-radius: 15px;
+  border: 3px solid #b1f5ef;
+  text-align: center;
+}
+
+.error {
+  border-color: red;
+}

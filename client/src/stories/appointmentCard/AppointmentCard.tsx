@@ -29,6 +29,10 @@ export interface AppointmentCardProps {
    * Appointment cabinet number
    */
   cabinetNumber: number;
+  /**
+   * Cancel appointment button click action
+   */
+  onClick?: () => void;
 }
 
 /**
@@ -41,6 +45,7 @@ const AppointmentCard = ({
   date,
   time,
   cabinetNumber,
+  onClick,
   ...props
 }: AppointmentCardProps) => {
   const [isOpened, setOpened] = useState("");
@@ -61,7 +66,7 @@ const AppointmentCard = ({
           <DualTextCard leftContent="ФИО" rightContent={fullName} />
           <DualTextCard
             leftContent="Дата и время"
-            rightContent={date + "|" + time}
+            rightContent={date + " | " + time}
           />
           <div className="wrapper">
             <div style={{ width: "calc(50% - 10px)", boxSizing: "border-box" }}>
@@ -71,7 +76,12 @@ const AppointmentCard = ({
               />
             </div>
             <div style={{ width: "calc(50% - 10px)", boxSizing: "border-box" }}>
-              <Button label="Отменить запись" warning={true} width="100%" />
+              <Button
+                label="Отменить запись"
+                warning={true}
+                width="100%"
+                onClick={onClick}
+              />
             </div>
           </div>
         </div>

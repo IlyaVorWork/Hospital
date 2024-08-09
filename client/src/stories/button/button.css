@@ -10,14 +10,14 @@
   height: 60px;
   transition:
     all,
-    ease-in 0.15s;
+    ease 0.25s;
 }
 .button:hover {
   box-shadow: rgba(0, 0, 0, 0.25) 0px 0px 8px 2px;
   background-color: #b1f5ef;
   transition:
     all,
-    ease-in 0.15s;
+    ease 0.25s;
 }
 .active {
   background-color: #b1f5ef;
@@ -30,5 +30,6 @@
   color: white;
 }
 .warning:hover {
-  background-color: #db3e3e;
+  background-color: #fff;
+  color: #db3e3e;
 }

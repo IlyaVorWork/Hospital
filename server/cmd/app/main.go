@@ -24,14 +24,26 @@ func main() {
 	r := gin.Default()
 	
 	db := repositories.ConnectDB()
+
 	authRepo := repositories.NewAuthRepository(db)
+	specRepo := repositories.NewSpecializationRepository(db)
+	doctorRepo := repositories.NewDoctorRepository(db)
+	scheduleRepo := repositories.NewScheduleRepository(db)
+
 	authService := service.NewAuthService(authRepo)
+	specService := service.NewSpecializationService(specRepo)
+	doctorService := service.NewDoctorService(doctorRepo)
+	scheduleService := service.NewScheduleService(scheduleRepo)
+
 	authHandler := api.NewAuthHandler(authService)
+	specHandler := api.NewSpecializationHandler(specService)
+	doctorHandler := api.NewDoctorHandler(doctorService)
+	scheduleHandler := api.NewScheduleHandler(scheduleService)
 
 
 	r.Use(cors.New(cors.Config{
         AllowOrigins:     []string{"http://localhost:3000"},
-        AllowMethods:     []string{"POST", "GET"},
+        AllowMethods:     []string{"POST", "GET", "PATCH"},
         AllowHeaders:     []string{"Authorization", "Content-type"},
         ExposeHeaders:    []string{"Content-Length"},
         AllowCredentials: true,
@@ -39,11 +51,22 @@ func main() {
     }))
 
 
-	user := r.Group("/auth")
+	auth := r.Group("/auth")
 	{
-		user.POST("/register", authHandler.Register)
-		user.POST("/login", authHandler.Login)
-		user.GET("/getUserData", authHandler.GetUserData)
+		auth.POST("/register", authHandler.Register)
+		auth.POST("/login", authHandler.Login)
+		auth.GET("/getPatientData", authHandler.GetPatientData)
+		auth.PATCH("/changePassword", authHandler.ChangePassword)
+	}
+
+	Appoint := r.Group("/appointment")
+	{
+		Appoint.GET("/specializations", specHandler.GetSpecializations)
+		Appoint.GET("/doctors", doctorHandler.GetDoctorsBySpec)
+		Appoint.GET("/tickets", scheduleHandler.GetFreeTickets)
+		Appoint.POST("/makeAppointment", scheduleHandler.MakeAppointment)
+		Appoint.GET("/getPatientAppointments", scheduleHandler.GetAppointmentsByPatientId)
+		Appoint.PATCH("/cancelAppointment", scheduleHandler.CancelAppointment)
 	}
 
 	err := r.Run()

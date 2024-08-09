@@ -22,14 +22,16 @@ const Header = ({ menu, ...props }: HeaderProps) => {
         <span className="logoText">Муниципальная больница</span>
       </div>
       <div className="buttonGroup">
-        {menu?.map(({ active, header, warning, width, label }) => {
+        {menu?.map(({ active, header, warning, width, label, onClick }) => {
           return (
             <Button
+              key={label}
               active={active}
               header={header}
               warning={warning}
               width={width}
               label={label}
+              onClick={onClick}
             />
           );
         })}
