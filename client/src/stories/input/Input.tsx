@@ -23,7 +23,13 @@ export interface InputProps {
 /**
  * Doctor choice component
  */
-const Input = ({ type, placeholder, onChange, ...props }: InputProps) => {
+const Input = ({
+  type,
+  placeholder,
+  value,
+  onChange,
+  ...props
+}: InputProps) => {
   {
     switch (type) {
       case "password":
@@ -33,6 +39,7 @@ const Input = ({ type, placeholder, onChange, ...props }: InputProps) => {
               type="password"
               placeholder={placeholder}
               onChange={onChange}
+              value={value}
             />
           </div>
         );
@@ -43,6 +50,7 @@ const Input = ({ type, placeholder, onChange, ...props }: InputProps) => {
               type="date"
               placeholder={placeholder}
               onChange={onChange}
+              value={value}
               //min={new Date().toISOString().split("T")[0]}
             />
           </div>
@@ -50,13 +58,23 @@ const Input = ({ type, placeholder, onChange, ...props }: InputProps) => {
       case "email":
         return (
           <div className="input">
-            <input type="email" placeholder={placeholder} onChange={onChange} />
+            <input
+              type="email"
+              placeholder={placeholder}
+              onChange={onChange}
+              value={value}
+            />
           </div>
         );
       default:
         return (
           <div className="input">
-            <input type="text" placeholder={placeholder} onChange={onChange} />
+            <input
+              type="text"
+              placeholder={placeholder}
+              onChange={onChange}
+              value={value}
+            />
           </div>
         );
     }

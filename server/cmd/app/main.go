@@ -29,21 +29,24 @@ func main() {
 	specRepo := repositories.NewSpecializationRepository(db)
 	doctorRepo := repositories.NewDoctorRepository(db)
 	scheduleRepo := repositories.NewScheduleRepository(db)
+	cabinetRepo := repositories.NewCabinetRepository(db)
 
 	authService := service.NewAuthService(authRepo)
 	specService := service.NewSpecializationService(specRepo)
 	doctorService := service.NewDoctorService(doctorRepo)
 	scheduleService := service.NewScheduleService(scheduleRepo)
+	cabinetService := service.NewCabinetService(cabinetRepo)
 
 	authHandler := api.NewAuthHandler(authService)
 	specHandler := api.NewSpecializationHandler(specService)
 	doctorHandler := api.NewDoctorHandler(doctorService)
 	scheduleHandler := api.NewScheduleHandler(scheduleService)
+	cabinetHandler := api.NewCabinetHandler(cabinetService)
 
 
 	r.Use(cors.New(cors.Config{
         AllowOrigins:     []string{"http://localhost:3000"},
-        AllowMethods:     []string{"POST", "GET", "PATCH"},
+        AllowMethods:     []string{"POST", "GET", "PATCH", "DELETE"},
         AllowHeaders:     []string{"Authorization", "Content-type"},
         ExposeHeaders:    []string{"Content-Length"},
         AllowCredentials: true,
@@ -59,15 +62,37 @@ func main() {
 		auth.PATCH("/changePassword", authHandler.ChangePassword)
 	}
 
-	Appoint := r.Group("/appointment")
+	appoint := r.Group("/appointment")
 	{
-		Appoint.GET("/specializations", specHandler.GetSpecializations)
-		Appoint.GET("/doctors", doctorHandler.GetDoctorsBySpec)
-		Appoint.GET("/tickets", scheduleHandler.GetFreeTickets)
-		Appoint.POST("/makeAppointment", scheduleHandler.MakeAppointment)
-		Appoint.GET("/getPatientAppointments", scheduleHandler.GetAppointmentsByPatientId)
-		Appoint.PATCH("/cancelAppointment", scheduleHandler.CancelAppointment)
+		appoint.GET("/specializations", specHandler.GetSpecializationsWithFreeTickets)
+		appoint.GET("/doctors", doctorHandler.GetDoctorsBySpec)
+		appoint.GET("/tickets", scheduleHandler.GetFreeTickets)
+		appoint.POST("/makeAppointment", scheduleHandler.MakeAppointment)
+		appoint.GET("/getPatientAppointments", scheduleHandler.GetAppointmentsByPatientId)
+		appoint.PATCH("/cancelAppointment", scheduleHandler.CancelAppointment)
 	}
+
+	specialization := r.Group("/specialization")
+	{
+		specialization.GET("/getSpecs", specHandler.GetSpecializations)
+	}
+
+	cabinet := r.Group("/cabinet")
+	{
+		cabinet.GET("/getCabinets", cabinetHandler.GetCabinets)
+		cabinet.POST("/addCabinet", cabinetHandler.AddCabinet)
+		cabinet.PATCH("/editCabinet", cabinetHandler.EditCabinet)
+		cabinet.DELETE("/deleteCabinet", cabinetHandler.DeleteCabinet)
+	}
+
+	doctor := r.Group("/doctor")
+	{
+		doctor.GET("/getDoctors", doctorHandler.GetDoctors)
+		doctor.POST("/addDoctor", doctorHandler.AddDoctor)
+		doctor.PATCH("/editDoctor", doctorHandler.EditDoctor)
+		doctor.DELETE("/deleteDoctor", doctorHandler.DeleteDoctor)
+	}
+
 
 	err := r.Run()
 	if err != nil {

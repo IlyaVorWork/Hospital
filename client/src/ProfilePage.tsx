@@ -59,6 +59,8 @@ const ProfilePage = () => {
   const [newPassword, setNewPassword] = useState<string>("");
   const [newPasswordCopy, setNewPasswordCopy] = useState<string>("");
 
+  const [openedAppointmentId, setOpenedAppointmentId] = useState<number>(-1);
+
   const changePart = (part: profilePart) => {
     setPart(part);
   };
@@ -218,7 +220,18 @@ const ProfilePage = () => {
         }
 
         return (
-          <div style={{ width: "100%" }}>
+          <div
+            style={{
+              width: "calc(100% + 12px)",
+              display: "flex",
+              flexDirection: "column",
+              gap: "20px",
+              height: "454px",
+              padding: "6px",
+              margin: "-6px",
+              overflowY: "scroll",
+              scrollSnapType: "y mandatory",
+            }}>
             {appointments.map(
               (
                 {
@@ -235,22 +248,32 @@ const ProfilePage = () => {
                 index
               ) => {
                 return (
-                  <AppointmentCard
-                    key={index}
-                    specialization={specialization}
-                    fullName={last_name + " " + first_name + " " + second_name}
-                    url={img_url}
-                    date={new Date(date).toLocaleDateString()}
-                    time={time}
-                    cabinetNumber={cabinet_number}
+                  <div
                     onClick={() =>
-                      cancelAppointment.mutate({
-                        date,
-                        cabinet_number,
-                        time_id,
-                      })
-                    }
-                  />
+                      setOpenedAppointmentId(
+                        openedAppointmentId === index ? -1 : index
+                      )
+                    }>
+                    <AppointmentCard
+                      key={index}
+                      specialization={specialization}
+                      fullName={
+                        last_name + " " + first_name + " " + second_name
+                      }
+                      url={img_url}
+                      date={new Date(date).toLocaleDateString()}
+                      time={time}
+                      cabinetNumber={cabinet_number}
+                      isOpened={openedAppointmentId === index}
+                      onClick={() =>
+                        cancelAppointment.mutate({
+                          date,
+                          cabinet_number,
+                          time_id,
+                        })
+                      }
+                    />
+                  </div>
                 );
               }
             )}
@@ -322,7 +345,7 @@ const ProfilePage = () => {
             flexDirection: "column",
             gap: "20px",
             alignItems: "center",
-            minHeight: "460px",
+            height: "460px",
           }}>
           {partContent()}
         </div>

@@ -6,7 +6,7 @@ import DualButton, { DualButtonProps } from "./stories/dualButton/DualButton";
 import DualCancelButton from "./stories/dualButton/DualCancelButton";
 import DoctorCard, { DoctorCardProps } from "./stories/doctorCard/DoctorCard";
 import Input from "./stories/input/Input";
-import Select from "./stories/select/Select";
+import Select, { SelectOption } from "./stories/select/Select";
 import { useMutation } from "react-query";
 import axios from "axios";
 import { useCookies } from "react-cookie";
@@ -37,7 +37,7 @@ type ticket = {
   date: Date;
   cabinet_number: number;
   time_id: number;
-  value: string;
+  time: string;
 };
 
 interface appointmentData {
@@ -127,6 +127,18 @@ const AppointmentPage = () => {
   useEffect(() => {
     getSpecializations.mutate();
   }, []);
+
+  const selectOptions = (tickets: ticket[], date: Date) => {
+    let filteredTickets = tickets.filter(
+      (el) => new Date(el.date).getTime() === date.getTime()
+    );
+    let options = filteredTickets.map((el, index) => {
+      let option: SelectOption = { id: index, value: el.time };
+      return option;
+    });
+
+    return options;
+  };
 
   const currentStep = () => {
     switch (step) {
@@ -302,14 +314,7 @@ const AppointmentPage = () => {
                   <Select
                     name="time"
                     value={selectedValue}
-                    options={
-                      date
-                        ? tickets.filter(
-                            (el) =>
-                              new Date(el.date).getTime() === date.getTime()
-                          )
-                        : []
-                    }
+                    options={date ? selectOptions(tickets, date) : []}
                     onChange={(event) => {
                       setSelectedValue(event.target.selectedOptions[0].value);
                       setTicket(parseInt(event.target.selectedOptions[0].id));

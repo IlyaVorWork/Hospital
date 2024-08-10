@@ -6,7 +6,7 @@ type Ticket struct {
 	Date time.Time `json:"date"`
 	Cabinet_number int `json:"cabinet_number"`
 	Time_id int `json:"time_id"`
-	Time string `json:"value"`
+	Time string `json:"time"`
 }
 
 type MakeAppointDTO struct {

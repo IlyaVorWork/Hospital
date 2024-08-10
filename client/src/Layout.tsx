@@ -4,7 +4,7 @@ import { ButtonProps } from "./stories/button/Button";
 import "./layout.css";
 import { useCookies } from "react-cookie";
 import { jwtDecode } from "jwt-decode";
-import { redirect, useNavigate } from "react-router-dom";
+import { redirect, useLocation, useNavigate } from "react-router-dom";
 import { ReactNotifications } from "react-notifications-component";
 import "react-notifications-component/dist/theme.css";
 
@@ -29,6 +29,9 @@ export type AccessTokenPayload = {
 const Layout = ({ children, ...props }: LayoutProps) => {
   const [accessToken, _, removeAcccessToken] = useCookies(["Access_token"]);
   const navigate = useNavigate();
+  const location = useLocation();
+
+  let currentPath = location.pathname.split("/").pop();
 
   const [menu, setMenu] = useState<ButtonProps[]>();
 
@@ -36,13 +39,15 @@ const Layout = ({ children, ...props }: LayoutProps) => {
     {
       header: true,
       label: "Записаться на приём",
+      active: currentPath === "makeAppointment",
       onClick: () => {
-        navigate("/appointment");
+        navigate("/makeAppointment");
       },
     },
     {
       header: true,
       label: "Личный кабинет",
+      active: currentPath === "profile",
       onClick: () => {
         navigate("/profile");
       },
@@ -61,22 +66,33 @@ const Layout = ({ children, ...props }: LayoutProps) => {
     {
       header: true,
       label: "Кабинеты",
+      active: currentPath === "cabinets",
       onClick: () => {
-        navigate("/manage/cabinets");
+        navigate("/cabinets");
       },
     },
     {
       header: true,
       label: "Врачи",
+      active: currentPath === "doctors",
       onClick: () => {
-        navigate("/manage/doctors");
+        navigate("/doctors");
       },
     },
     {
       header: true,
       label: "Расписание",
+      active: currentPath === "schedule",
       onClick: () => {
-        navigate("/manage/schedule");
+        navigate("/schedule");
+      },
+    },
+    {
+      header: true,
+      label: "Записи",
+      active: currentPath === "appointments",
+      onClick: () => {
+        navigate("/appointments");
       },
     },
     {

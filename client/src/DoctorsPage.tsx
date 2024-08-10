@@ -1,37 +1,55 @@
-import React, { useEffect, useState } from "react";
-import Button from "./stories/button/Button";
+import { ChangeEvent, useEffect, useState } from "react";
 import Layout from "./Layout";
+import Button from "./stories/button/Button";
+import { action, specialization } from "./CabinetsPage";
 import Input from "./stories/input/Input";
 import Select, { SelectOption } from "./stories/select/Select";
 import { useMutation } from "react-query";
 import axios, { AxiosError } from "axios";
 import { useCookies } from "react-cookie";
-import InfoCard from "./stories/infoCard/InfoCard";
 import { Store } from "react-notifications-component";
 import { Error } from "./LoginPage";
 
-export type action = "add" | "edit" | "delete";
-export type specialization = {
+type doctor = {
   id: number;
-  name: string;
+  last_name: string;
+  first_name: string;
+  second_name: string;
+  id_spec: number;
+  img_url: string;
 };
-type cabinet = {
-  number: number;
+
+type addDoctorData = {
+  last_name: string;
+  first_name: string;
+  second_name: string;
   id_specialization: number;
+  img_url: string;
 };
 
-const CabinetPage = () => {
-  const [cookies] = useCookies(["Access_token"]);
-  const [specsList, setSpecs] = useState<specialization[]>([]);
-  const [cabinetsList, setCabinets] = useState<cabinet[]>([]);
+type editDoctorData = {
+  id: number;
+  last_name: string;
+  first_name: string;
+  second_name: string;
+  img_url: string;
+};
 
+const DoctorsPage = () => {
+  const [cookies] = useCookies(["Access_token"]);
   const [action, setAction] = useState<action>("add");
-  const [inputedNumber, setInputedNumber] = useState<string>("");
+
+  const [specsList, setSpecs] = useState<specialization[]>([]);
+  const [doctosList, setDoctors] = useState<doctor[]>([]);
+
+  const [fullName, setFullName] = useState<string>("");
+  const [avatarUrl, setAvatarUrl] = useState<string>("");
+
   const [selectedSpec, setSelectedSpec] = useState<string>("");
   const [selectedSpecId, setSelectedSpecId] = useState<number>(-1);
 
-  const [selectedCabinet, setSelectedCabinet] = useState<string>("");
-  const [currectSpecId, setCurrentSpecId] = useState<number>(-1);
+  const [selectedDoctor, setSelectedDoctor] = useState<string>("");
+  const [selectedDoctorId, setSelectedDoctorId] = useState<number>(-1);
 
   const getSpecializations = useMutation({
     mutationFn: () => {
@@ -42,37 +60,36 @@ const CabinetPage = () => {
       });
     },
     onSuccess: (res) => {
-      console.log(res.data["specializations"]);
       setSpecs(res.data["specializations"]);
     },
   });
 
-  const getCabinets = useMutation({
+  const getDoctors = useMutation({
     mutationFn: () => {
       return axios({
         headers: { Authorization: cookies.Access_token },
         method: "get",
-        url: "http://localhost:8080/cabinet/getCabinets",
+        url: "http://localhost:8080/doctor/getDoctors",
       });
     },
     onSuccess: (res) => {
-      setCabinets(res.data["cabinets"]);
+      setDoctors(res.data["doctors"]);
     },
   });
 
-  const addCabinet = useMutation({
-    mutationFn: (cabinet: cabinet) => {
+  const addDoctor = useMutation({
+    mutationFn: (data: addDoctorData) => {
       return axios({
         headers: { Authorization: cookies.Access_token },
         method: "post",
-        url: "http://localhost:8080/cabinet/addCabinet",
-        data: cabinet,
+        url: "http://localhost:8080/doctor/addDoctor",
+        data: data,
       });
     },
     onSuccess: () => {
       Store.addNotification({
         title: "Успех",
-        message: "Кабинет был успешно добавлен",
+        message: "Доктор был успешно добавлен",
         insert: "top",
         container: "bottom-right",
         type: "info",
@@ -83,7 +100,8 @@ const CabinetPage = () => {
           onScreen: true,
         },
       });
-      setInputedNumber("");
+      setFullName("");
+      setAvatarUrl("");
       setSelectedSpec("");
       setSelectedSpecId(-1);
     },
@@ -105,19 +123,19 @@ const CabinetPage = () => {
     },
   });
 
-  const editCabinet = useMutation({
-    mutationFn: (cabinet: cabinet) => {
+  const editDoctor = useMutation({
+    mutationFn: (data: editDoctorData) => {
       return axios({
         headers: { Authorization: cookies.Access_token },
         method: "patch",
-        url: "http://localhost:8080/cabinet/editCabinet",
-        data: cabinet,
+        url: "http://localhost:8080/doctor/editDoctor",
+        data: data,
       });
     },
     onSuccess: () => {
       Store.addNotification({
         title: "Успех",
-        message: "Кабинет был успешно изменён",
+        message: "Доктор был успешно изменён",
         insert: "top",
         container: "bottom-right",
         type: "info",
@@ -128,10 +146,10 @@ const CabinetPage = () => {
           onScreen: true,
         },
       });
-      setSelectedCabinet("");
-      setCurrentSpecId(-1);
-      setSelectedSpec("");
-      setSelectedSpecId(-1);
+      setSelectedDoctor("");
+      setSelectedDoctorId(-1);
+      setFullName("");
+      setAvatarUrl("");
     },
     onError: (error: AxiosError) => {
       let err: Error = error.response?.data as Error;
@@ -151,19 +169,19 @@ const CabinetPage = () => {
     },
   });
 
-  const deleteCabinet = useMutation({
-    mutationFn: (cabinetNumber: number) => {
+  const deleteDoctor = useMutation({
+    mutationFn: (id: number) => {
       return axios({
         headers: { Authorization: cookies.Access_token },
         method: "delete",
-        url: "http://localhost:8080/cabinet/deleteCabinet",
-        data: { number: cabinetNumber },
+        url: "http://localhost:8080/doctor/deleteDoctor",
+        data: { id: id },
       });
     },
     onSuccess: () => {
       Store.addNotification({
         title: "Успех",
-        message: "Кабинет был успешно удалён",
+        message: "Доктор был успешно удалён",
         insert: "top",
         container: "bottom-right",
         type: "info",
@@ -174,8 +192,8 @@ const CabinetPage = () => {
           onScreen: true,
         },
       });
-      setSelectedCabinet("");
-      setSelectedSpecId(-1);
+      setSelectedDoctor("");
+      setSelectedDoctorId(-1);
     },
     onError: (error: AxiosError) => {
       let err: Error = error.response?.data as Error;
@@ -198,20 +216,31 @@ const CabinetPage = () => {
   useEffect(() => {
     switch (action) {
       case "add":
-        setSelectedCabinet("");
+        setFullName("");
+        setAvatarUrl("");
         setSelectedSpec("");
+        setSelectedSpecId(-1);
+        setSelectedDoctor("");
+        setSelectedDoctorId(-1);
         getSpecializations.mutate();
         break;
       case "edit":
-        setSelectedCabinet("");
+        setFullName("");
+        setAvatarUrl("");
         setSelectedSpec("");
-        getSpecializations.mutate();
-        getCabinets.mutate();
+        setSelectedSpecId(-1);
+        setSelectedDoctor("");
+        setSelectedDoctorId(-1);
+        getDoctors.mutate();
         break;
       case "delete":
-        getCabinets.mutate();
-        setSelectedCabinet("");
+        setFullName("");
+        setAvatarUrl("");
         setSelectedSpec("");
+        setSelectedSpecId(-1);
+        setSelectedDoctor("");
+        setSelectedDoctorId(-1);
+        getDoctors.mutate();
         break;
     }
   }, [action]);
@@ -222,12 +251,14 @@ const CabinetPage = () => {
         return (
           <>
             <Input
-              placeholder="Введите номер кабинета"
-              value={inputedNumber}
-              onChange={(event) => {
-                setInputedNumber(event.target.value);
-                console.log(event.target.value);
-              }}
+              placeholder={"Введите ФИО"}
+              value={fullName}
+              onChange={(event) => setFullName(event.target.value)}
+            />
+            <Input
+              placeholder={"Введите ссылку на фото"}
+              value={avatarUrl}
+              onChange={(event) => setAvatarUrl(event.target.value)}
             />
             <Select
               name="specialization"
@@ -247,8 +278,13 @@ const CabinetPage = () => {
             <Button
               label="Добавить"
               onClick={() => {
-                addCabinet.mutate({
-                  number: parseInt(inputedNumber),
+                let [last, first, second] = fullName.split(" ");
+                console.log(last, first, second);
+                addDoctor.mutate({
+                  last_name: last,
+                  first_name: first,
+                  second_name: second,
+                  img_url: avatarUrl,
                   id_specialization: selectedSpecId,
                 });
               }}
@@ -259,65 +295,53 @@ const CabinetPage = () => {
         return (
           <>
             <Select
-              name="cabinet"
-              value={selectedCabinet}
-              options={cabinetsList.map((el, index) => {
+              name="doctor"
+              value={selectedDoctor}
+              options={doctosList.map((el) => {
                 let option: SelectOption = {
-                  id: index,
-                  value: el.number.toString(),
+                  id: el.id,
+                  value:
+                    el.last_name + " " + el.first_name + " " + el.second_name,
                 };
                 return option;
               })}
               onChange={(event) => {
-                setSelectedCabinet(event.target.selectedOptions[0].value);
-                setCurrentSpecId(
-                  cabinetsList.find(
+                setSelectedDoctorId(
+                  parseInt(event.target.selectedOptions[0].id)
+                );
+                setSelectedDoctor(event.target.selectedOptions[0].value);
+                setFullName(event.target.selectedOptions[0].value);
+                console.log(parseInt(event.target.selectedOptions[0].id));
+                setAvatarUrl(
+                  doctosList.find(
                     (el) =>
-                      el.number ===
-                      parseInt(event.target.selectedOptions[0].value)
-                  )!.id_specialization
+                      el.id === parseInt(event.target.selectedOptions[0].id)
+                  )!.img_url
                 );
               }}
             />
-            {selectedCabinet ? (
+            {selectedDoctor ? (
               <>
-                <InfoCard
-                  text={
-                    "Текущая специализация: " +
-                    specsList.find(
-                      (el) =>
-                        el.id ===
-                        cabinetsList.find(
-                          (el) => el.number.toString() === selectedCabinet
-                        )?.id_specialization
-                    )?.name
-                  }
+                <Input
+                  placeholder={"Введите ФИО"}
+                  value={fullName}
+                  onChange={(event) => setFullName(event.target.value)}
                 />
-                <Select
-                  name="specialization"
-                  value={selectedSpec}
-                  options={specsList
-                    .filter((el) => el.id !== currectSpecId)
-                    .map((el) => {
-                      let option: SelectOption = {
-                        id: el.id,
-                        value: el.name,
-                      };
-                      return option;
-                    })}
-                  onChange={(event) => {
-                    setSelectedSpecId(
-                      parseInt(event.target.selectedOptions[0].id)
-                    );
-                    setSelectedSpec(event.target.selectedOptions[0].value);
-                  }}
+                <Input
+                  placeholder={"Введите ссылку на фото"}
+                  value={avatarUrl}
+                  onChange={(event) => setAvatarUrl(event.target.value)}
                 />
                 <Button
                   label="Изменить"
                   onClick={() => {
-                    editCabinet.mutate({
-                      number: parseInt(selectedCabinet),
-                      id_specialization: selectedSpecId,
+                    let [last, first, second] = fullName.split(" ");
+                    editDoctor.mutate({
+                      id: selectedDoctorId,
+                      last_name: last,
+                      first_name: first,
+                      second_name: second,
+                      img_url: avatarUrl,
                     });
                   }}
                 />
@@ -329,29 +353,28 @@ const CabinetPage = () => {
         return (
           <>
             <Select
-              name="cabinet"
-              value={selectedCabinet}
-              options={cabinetsList.map((el, index) => {
+              name="doctor"
+              value={selectedDoctor}
+              options={doctosList.map((el) => {
                 let option: SelectOption = {
-                  id: index,
-                  value: el.number.toString(),
+                  id: el.id,
+                  value:
+                    el.last_name + " " + el.first_name + " " + el.second_name,
                 };
                 return option;
               })}
               onChange={(event) => {
-                setSelectedCabinet(event.target.selectedOptions[0].value);
-                setCurrentSpecId(
-                  cabinetsList.find(
-                    (el) =>
-                      el.number ===
-                      parseInt(event.target.selectedOptions[0].value)
-                  )!.id_specialization
+                setSelectedDoctorId(
+                  parseInt(event.target.selectedOptions[0].id)
                 );
+                setSelectedDoctor(event.target.selectedOptions[0].value);
               }}
             />
             <Button
               label="Удалить"
-              onClick={() => deleteCabinet.mutate(parseInt(selectedCabinet))}
+              onClick={() => {
+                deleteDoctor.mutate(selectedDoctorId);
+              }}
             />
           </>
         );
@@ -408,4 +431,4 @@ const CabinetPage = () => {
   );
 };
 
-export default CabinetPage;
+export default DoctorsPage;

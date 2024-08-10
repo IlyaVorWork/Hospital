@@ -15,14 +15,16 @@ import ProfilePage from "./ProfilePage";
 import { jwtDecode } from "jwt-decode";
 import NotFoundPage from "./NotFoundPage";
 import CabinetPage from "./CabinetsPage";
+import DoctorsPage from "./DoctorsPage";
 
 const queryClient = new QueryClient();
 const cookies = new Cookies();
 
-const adminAllowedPaths = ["cabinets", "doctors", "schedule"];
-const patientAllowedPaths = ["appointment", "profile"];
+const adminAllowedPaths = ["cabinets", "doctors", "schedule", "appointments"];
+const patientAllowedPaths = ["makeAppointment", "profile"];
 
 const isLoggedIn = async ({ request }: LoaderFunctionArgs) => {
+  console.log("Проверка авторизации");
   const accessToken = cookies.get("Access_token");
   let destination = request.url.split("/").pop();
   if (!accessToken && destination === "login") {
@@ -33,6 +35,7 @@ const isLoggedIn = async ({ request }: LoaderFunctionArgs) => {
   }
   let claims: tokenClaims = jwtDecode(accessToken);
   if (claims.exp * 1000 < new Date().getTime()) {
+    cookies.remove("Access_token");
     return redirect("/login");
   }
   switch (claims.role) {
@@ -40,7 +43,7 @@ const isLoggedIn = async ({ request }: LoaderFunctionArgs) => {
       if (
         patientAllowedPaths.findIndex((value) => value === destination) === -1
       ) {
-        return redirect("/appointment");
+        return redirect("/makeAppointment");
       }
       break;
     case "admin":
@@ -65,7 +68,7 @@ const router = createBrowserRouter([
         loader: isLoggedIn,
       },
       {
-        path: "appointment",
+        path: "makeAppointment",
         element: <AppointmentPage />,
         loader: isLoggedIn,
       },
@@ -81,7 +84,7 @@ const router = createBrowserRouter([
       },
       {
         path: "doctors",
-        element: <div>Доктора</div>,
+        element: <DoctorsPage />,
         loader: isLoggedIn,
       },
       {

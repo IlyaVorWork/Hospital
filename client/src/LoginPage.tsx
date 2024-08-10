@@ -55,7 +55,7 @@ const LoginPage = () => {
       let claims: tokenClaims = jwtDecode(res.data["Access_token"]);
       switch (claims.role) {
         case "patient":
-          navigate("/appointment");
+          navigate("/makeAppointment");
           break;
         case "admin":
           navigate("/cabinets");

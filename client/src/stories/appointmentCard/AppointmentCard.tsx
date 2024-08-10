@@ -30,6 +30,10 @@ export interface AppointmentCardProps {
    */
   cabinetNumber: number;
   /**
+   * Is appointment opened
+   */
+  isOpened: boolean;
+  /**
    * Cancel appointment button click action
    */
   onClick?: () => void;
@@ -45,17 +49,15 @@ const AppointmentCard = ({
   date,
   time,
   cabinetNumber,
+  isOpened,
   onClick,
   ...props
 }: AppointmentCardProps) => {
-  const [isOpened, setOpened] = useState("");
-  const changeVisibility = () => {
-    isOpened == "" ? setOpened("opened") : setOpened("");
-  };
+  let opened = isOpened ? "opened" : "";
 
   return (
-    <div className={["appointment", isOpened].join(" ")}>
-      <div className="miniCard" onClick={changeVisibility}>
+    <div className={["appointment", opened].join(" ")}>
+      <div className="miniCard">
         <span>{specialization}</span>
         <span>{date}</span>
         <DownArrow className="appointmentDownArrow" />

@@ -25,5 +25,17 @@ export const Default: Story = {
     date: "01.01.2024",
     time: "16:00 - 16:15",
     cabinetNumber: 304,
+    isOpened: false,
+  },
+};
+
+export const Opened: Story = {
+  args: {
+    specialization: "Отолоринголог",
+    fullName: "Иванов Иван Иванович",
+    date: "01.01.2024",
+    time: "16:00 - 16:15",
+    cabinetNumber: 304,
+    isOpened: true,
   },
 };
