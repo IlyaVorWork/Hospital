@@ -16,6 +16,7 @@ type AuthRepositoryInterface interface {
 	Login(loginData models.LoginDTO) (models.User, error)
 	Register(user models.RegisterDTO, password []byte) error
 	ChangePassword(patient_id int, passHash []byte) error
+	GetPatients() ([]models.Patient, error)
 }
 
 type AuthService struct {
@@ -98,4 +99,13 @@ func (service AuthService) ChangePassword(patient_id int, password string) error
 	}
 
 	return nil
+}
+
+func (service AuthService) GetPatients() ([]models.Patient, error) {
+	patients, err := service.repo.GetPatients()
+	if err != nil {
+		return nil, err
+	}
+
+	return patients, nil
 }

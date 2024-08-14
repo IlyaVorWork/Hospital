@@ -1,7 +1,6 @@
 package api
 
 import (
-	"fmt"
 	"net/http"
 	"server/internal/models"
 	"strconv"
@@ -27,7 +26,7 @@ func NewDoctorHandler(service DoctorServiceInterface) *DoctorHandler {
 
 func (handler *DoctorHandler) GetDoctorsBySpec(c *gin.Context) {
 	
-	_, err := VerifyToken(c, "patient")
+	_, err := VerifyToken(c, "any")
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"Error": err.Error()})
 		return
@@ -79,8 +78,6 @@ func (handler *DoctorHandler) AddDoctor(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"Error": err.Error()})
 		return
 	}
-
-	fmt.Println(queryData)
 
 	err = handler.service.AddDoctor(queryData)
 	if err != nil {

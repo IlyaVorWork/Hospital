@@ -13,6 +13,10 @@ export interface SelectProps {
    */
   name: string;
   /**
+   * Width of select element
+   */
+  width?: string;
+  /**
    * Selected value
    */
   value?: any;
@@ -35,16 +39,25 @@ const title = (name: string) => {
     case "cabinet":
       return "Выберите кабинет";
     case "doctor":
-      return "Выберите доктора";
+      return "Выберите врача";
+    case "patient":
+      return "Выберите пациента";
   }
 };
 
 /**
  * Doctor choice component
  */
-const Select = ({ name, value, options, onChange, ...props }: SelectProps) => {
+const Select = ({
+  name,
+  width,
+  value,
+  options,
+  onChange,
+  ...props
+}: SelectProps) => {
   return (
-    <div className="select">
+    <div className="select" style={{ width: width }}>
       <select
         name={name}
         onChange={(event) => {

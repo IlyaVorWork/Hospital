@@ -1,0 +1,11 @@
+.checkboxList {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: calc(100%+12px);
+  height: 232px;
+  padding: 6px;
+  margin: -6px;
+  overflow-y: scroll;
+  scroll-snap-type: y mandatory;
+}

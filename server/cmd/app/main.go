@@ -60,6 +60,7 @@ func main() {
 		auth.POST("/login", authHandler.Login)
 		auth.GET("/getPatientData", authHandler.GetPatientData)
 		auth.PATCH("/changePassword", authHandler.ChangePassword)
+		auth.GET("/getPatients", authHandler.GetPatients)
 	}
 
 	appoint := r.Group("/appointment")
@@ -69,7 +70,12 @@ func main() {
 		appoint.GET("/tickets", scheduleHandler.GetFreeTickets)
 		appoint.POST("/makeAppointment", scheduleHandler.MakeAppointment)
 		appoint.GET("/getPatientAppointments", scheduleHandler.GetAppointmentsByPatientId)
+		appoint.GET("/getAppointments", scheduleHandler.GetAppointments)
 		appoint.PATCH("/cancelAppointment", scheduleHandler.CancelAppointment)
+		appoint.POST("/getFreeTimes", scheduleHandler.GetFreeTimes)
+		appoint.POST("/makeSchedule", scheduleHandler.MakeSchedule)
+		appoint.POST("/getSchedule", scheduleHandler.GetSchedule)
+		appoint.DELETE("/deleteSchedule", scheduleHandler.DeleteSchedule)
 	}
 
 	specialization := r.Group("/specialization")

@@ -46,3 +46,10 @@ export const Email: Story = {
     placeholder: "Введите почту",
   },
 };
+
+export const Checkbox: Story = {
+  args: {
+    type: "checkbox",
+    value: "1",
+  },
+};

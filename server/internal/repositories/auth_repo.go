@@ -15,6 +15,7 @@ var (
 	GET_PATIENT_BY_ID = "SELECT id, login, password FROM public.patient WHERE id = $1"
 	REGISTER = "INSERT INTO public.patient(login, password, last_name, first_name, second_name, birth_date, sex_id, passport_series, passport_number, issue_date, issuer, snils_number) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)"
 	CHANGE_PASSWORD = "UPDATE public.patient SET password=$1 WHERE id = $2"
+	GET_PATIENTS = "SELECT id, last_name, first_name, second_name, passport_number, passport_series FROM public.patient"
 )
 
 type AuthRepository struct{
@@ -91,4 +92,24 @@ func (repo AuthRepository) ChangePassword(patient_id int, passHash []byte) error
 	}
 
 	return nil
+}
+
+func (repo AuthRepository) GetPatients() ([]models.Patient, error) {
+	var patients []models.Patient
+
+	rows, err := repo.db.Query(GET_PATIENTS)
+	if err != nil {
+		return nil, err
+	}
+
+	for rows.Next() {
+		var patient models.Patient
+		err = rows.Scan(&patient.Id, &patient.Last_name, &patient.First_name, &patient.Second_name, &patient.Passport_number, &patient.Passport_series)
+		if err != nil {
+			return nil, err
+		}
+		patients = append(patients, patient)
+	}
+
+	return patients, nil
 }

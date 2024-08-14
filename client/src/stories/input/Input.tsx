@@ -11,6 +11,10 @@ export interface InputProps {
    */
   placeholder?: string;
   /**
+   * Is option checked for input type checkbox
+   */
+  isChecked?: boolean;
+  /**
    * Input value
    */
   value?: any;
@@ -26,6 +30,7 @@ export interface InputProps {
 const Input = ({
   type,
   placeholder,
+  isChecked,
   value,
   onChange,
   ...props
@@ -50,7 +55,11 @@ const Input = ({
               type="date"
               placeholder={placeholder}
               onChange={onChange}
-              value={value}
+              value={
+                value && typeof value != "string"
+                  ? value?.toISOString().split("T")[0]
+                  : ""
+              }
               //min={new Date().toISOString().split("T")[0]}
             />
           </div>
@@ -64,6 +73,21 @@ const Input = ({
               onChange={onChange}
               value={value}
             />
+          </div>
+        );
+      case "checkbox":
+        return (
+          <div className="input">
+            <div className="checkbox">
+              <input
+                type="checkbox"
+                value={value}
+                name={value}
+                checked={isChecked}
+                onChange={onChange}
+              />
+              <label htmlFor={value}>{placeholder}</label>
+            </div>
           </div>
         );
       default:

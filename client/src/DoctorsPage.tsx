@@ -10,12 +10,12 @@ import { useCookies } from "react-cookie";
 import { Store } from "react-notifications-component";
 import { Error } from "./LoginPage";
 
-type doctor = {
+export type doctor = {
   id: number;
   last_name: string;
   first_name: string;
   second_name: string;
-  id_spec: number;
+  id_specialization: number;
   img_url: string;
 };
 
@@ -40,7 +40,7 @@ const DoctorsPage = () => {
   const [action, setAction] = useState<action>("add");
 
   const [specsList, setSpecs] = useState<specialization[]>([]);
-  const [doctosList, setDoctors] = useState<doctor[]>([]);
+  const [doctorsList, setDoctors] = useState<doctor[]>([]);
 
   const [fullName, setFullName] = useState<string>("");
   const [avatarUrl, setAvatarUrl] = useState<string>("");
@@ -89,7 +89,7 @@ const DoctorsPage = () => {
     onSuccess: () => {
       Store.addNotification({
         title: "Успех",
-        message: "Доктор был успешно добавлен",
+        message: "Информация о враче была успешно добавлена",
         insert: "top",
         container: "bottom-right",
         type: "info",
@@ -135,7 +135,7 @@ const DoctorsPage = () => {
     onSuccess: () => {
       Store.addNotification({
         title: "Успех",
-        message: "Доктор был успешно изменён",
+        message: "Информация о враче была успешно изменена",
         insert: "top",
         container: "bottom-right",
         type: "info",
@@ -192,6 +192,7 @@ const DoctorsPage = () => {
           onScreen: true,
         },
       });
+      setDoctors(doctorsList.filter((el) => el.id !== selectedDoctorId));
       setSelectedDoctor("");
       setSelectedDoctorId(-1);
     },
@@ -297,7 +298,7 @@ const DoctorsPage = () => {
             <Select
               name="doctor"
               value={selectedDoctor}
-              options={doctosList.map((el) => {
+              options={doctorsList.map((el) => {
                 let option: SelectOption = {
                   id: el.id,
                   value:
@@ -313,7 +314,7 @@ const DoctorsPage = () => {
                 setFullName(event.target.selectedOptions[0].value);
                 console.log(parseInt(event.target.selectedOptions[0].id));
                 setAvatarUrl(
-                  doctosList.find(
+                  doctorsList.find(
                     (el) =>
                       el.id === parseInt(event.target.selectedOptions[0].id)
                   )!.img_url
@@ -355,7 +356,7 @@ const DoctorsPage = () => {
             <Select
               name="doctor"
               value={selectedDoctor}
-              options={doctosList.map((el) => {
+              options={doctorsList.map((el) => {
                 let option: SelectOption = {
                   id: el.id,
                   value:

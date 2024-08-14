@@ -174,6 +174,9 @@ const CabinetPage = () => {
           onScreen: true,
         },
       });
+      setCabinets(
+        cabinetsList.filter((el) => el.number !== parseInt(selectedCabinet))
+      );
       setSelectedCabinet("");
       setSelectedSpecId(-1);
     },

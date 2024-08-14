@@ -4,9 +4,10 @@
   padding: 5px;
   box-shadow: rgba(0, 0, 0, 0.25) 0px 0px 4px 0px;
   border-radius: 15px;
+  scroll-snap-align: center;
 }
 
-input {
+.input input {
   box-sizing: border-box;
   width: 100%;
   height: 100%;
@@ -15,6 +16,27 @@ input {
   padding: 10px;
 }
 
-input:invalid {
+.input input:invalid {
   border-color: #db3e3e;
+}
+
+.checkbox {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  border: 3px solid #b1f5ef;
+  border-radius: 15px;
+  padding: 10px;
+}
+
+.checkbox input {
+  width: 20px;
+  height: 20px;
+}
+
+.checkbox label {
+  margin-left: 15px;
 }

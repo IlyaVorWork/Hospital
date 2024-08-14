@@ -17,6 +17,7 @@ type AuthServiceInterface interface {
 	Register(patient models.RegisterDTO) error
 	GetPatientData(id int) (models.Patient, error)
 	ChangePassword(patient_id int, password string) error
+	GetPatients() ([]models.Patient, error)
 }
 
 type AuthHandler struct {
@@ -49,7 +50,8 @@ func VerifyToken(c *gin.Context, role string) (models.TokenClaims, error) {
 		return claims, customError.ErrExpiredToken
 	}
 
-	if claims.Role != role {
+
+	if role != "any" && claims.Role != role {
 		return claims, customError.ErrActionNotAllowed
 	}
 
@@ -138,4 +140,21 @@ func (handler *AuthHandler) ChangePassword(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"Result": "success"})
+}
+
+func (handler *AuthHandler) GetPatients(c *gin.Context) {
+
+	_, err := VerifyToken(c, "admin")
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"Error": err.Error()})
+		return
+	}
+
+	patients, err := handler.service.GetPatients()
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"Error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"patients": patients})
 }

@@ -12,7 +12,6 @@ import axios from "axios";
 import { useCookies } from "react-cookie";
 import { useNavigate } from "react-router-dom";
 import Loading from "./stories/loading/Loading";
-import DualTextCard from "./stories/dualTextCard/DualTextCard";
 import InfoCard from "./stories/infoCard/InfoCard";
 
 type step = 1 | 2 | 3;
@@ -40,7 +39,7 @@ type ticket = {
   time: string;
 };
 
-interface appointmentData {
+export interface appointmentData {
   date: Date;
   cabinet_number: number;
   time_id: number;
@@ -50,9 +49,10 @@ const AppointmentPage = () => {
   const navigate = useNavigate();
   const [cookies] = useCookies(["Access_token"]);
 
-  const [specs, setSpecs] = useState<spec[]>();
-  const [doctors, setDoctors] = useState<doctor[]>();
-  const [tickets, setTickets] = useState<ticket[]>();
+  const [specs, setSpecs] = useState<spec[]>([]);
+  const [doctors, setDoctors] = useState<doctor[]>([]);
+  const [tickets, setTickets] = useState<ticket[]>([]);
+  const [filteredTickets, setFilteredTickets] = useState<ticket[]>([]);
 
   const [step, setStep] = useState<step>(1);
   const [spec, setSpec] = useState<string>("");
@@ -71,7 +71,7 @@ const AppointmentPage = () => {
       });
     },
     onSuccess: (res) => {
-      setSpecs(res.data["specializations"]);
+      setSpecs(res.data["specializations"] ? res.data["specializations"] : []);
     },
   });
 
@@ -84,7 +84,7 @@ const AppointmentPage = () => {
       });
     },
     onSuccess: (res) => {
-      setDoctors(res.data["doctors"]);
+      setDoctors(res.data["doctors"] ? res.data["doctors"] : []);
     },
   });
 
@@ -97,7 +97,7 @@ const AppointmentPage = () => {
       });
     },
     onSuccess: (res) => {
-      if (res.data["tickets"] !== null) {
+      if (res.data["tickets"]) {
         setTickets(
           res.data["tickets"].map((el: ticket, index: number) => ({
             ...el,
@@ -105,7 +105,7 @@ const AppointmentPage = () => {
           }))
         );
       } else {
-        setTickets(res.data["tickets"]);
+        setTickets([]);
       }
     },
   });
@@ -120,7 +120,7 @@ const AppointmentPage = () => {
       });
     },
     onSuccess: () => {
-      navigate("/profile");
+      navigate("/profile", { state: { part: "appointments" } });
     },
   });
 
@@ -128,11 +128,14 @@ const AppointmentPage = () => {
     getSpecializations.mutate();
   }, []);
 
-  const selectOptions = (tickets: ticket[], date: Date) => {
-    let filteredTickets = tickets.filter(
-      (el) => new Date(el.date).getTime() === date.getTime()
+  const filterTickets = (tickets: ticket[], date: Date) => {
+    setFilteredTickets(
+      tickets.filter((el) => new Date(el.date).getTime() === date.getTime())
     );
-    let options = filteredTickets.map((el, index) => {
+  };
+
+  const selectOptions = (tickets: ticket[]) => {
+    let options = tickets.map((el, index) => {
       let option: SelectOption = { id: index, value: el.time };
       return option;
     });
@@ -308,13 +311,15 @@ const AppointmentPage = () => {
                     value={date}
                     onChange={(event) => {
                       setDate(new Date(event.target.value));
+                      filterTickets(tickets, new Date(event.target.value));
+                      console.log(filteredTickets);
                       setSelectedValue("");
                     }}
                   />
                   <Select
                     name="time"
                     value={selectedValue}
-                    options={date ? selectOptions(tickets, date) : []}
+                    options={date ? selectOptions(filteredTickets) : []}
                     onChange={(event) => {
                       setSelectedValue(event.target.selectedOptions[0].value);
                       setTicket(parseInt(event.target.selectedOptions[0].id));
@@ -325,9 +330,9 @@ const AppointmentPage = () => {
                     width="calc(100% - 115px)"
                     onClick={() => {
                       makeAppointment.mutate({
-                        date: tickets[ticket].date,
-                        cabinet_number: tickets[ticket].cabinet_number,
-                        time_id: tickets[ticket].time_id,
+                        date: filteredTickets[ticket].date,
+                        cabinet_number: filteredTickets[ticket].cabinet_number,
+                        time_id: filteredTickets[ticket].time_id,
                       });
                     }}
                   />

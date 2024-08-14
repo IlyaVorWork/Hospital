@@ -10,3 +10,12 @@
 .error {
   border-color: red;
 }
+
+.big {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 15px;
+  height: 100%;
+}

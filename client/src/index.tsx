@@ -16,6 +16,8 @@ import { jwtDecode } from "jwt-decode";
 import NotFoundPage from "./NotFoundPage";
 import CabinetPage from "./CabinetsPage";
 import DoctorsPage from "./DoctorsPage";
+import ManageAppointmentsPage from "./ManageAppointmentsPage";
+import SchedulePage from "./SchedulePage";
 
 const queryClient = new QueryClient();
 const cookies = new Cookies();
@@ -89,7 +91,12 @@ const router = createBrowserRouter([
       },
       {
         path: "schedule",
-        element: <div>Расписание</div>,
+        element: <SchedulePage />,
+        loader: isLoggedIn,
+      },
+      {
+        path: "appointments",
+        element: <ManageAppointmentsPage />,
         loader: isLoggedIn,
       },
     ],

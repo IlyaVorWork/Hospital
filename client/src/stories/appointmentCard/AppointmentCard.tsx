@@ -36,7 +36,7 @@ export interface AppointmentCardProps {
   /**
    * Cancel appointment button click action
    */
-  onClick?: () => void;
+  onClick?: (event?: React.MouseEvent<HTMLElement>) => void;
 }
 
 /**

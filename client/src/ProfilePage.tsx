@@ -3,19 +3,19 @@ import Layout from "./Layout";
 import Input from "./stories/input/Input";
 import Button from "./stories/button/Button";
 import { useMutation } from "react-query";
-import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import axios, { AxiosError } from "axios";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useCookies } from "react-cookie";
 import DualTextCard from "./stories/dualTextCard/DualTextCard";
 import AppointmentCard from "./stories/appointmentCard/AppointmentCard";
-import { number } from "prop-types";
 import Loading from "./stories/loading/Loading";
 import InfoCard from "./stories/infoCard/InfoCard";
+import { Store } from "react-notifications-component";
+import { Error } from "./LoginPage";
 
 type profilePart = "data" | "appointments" | "changePassword";
-type infoCardType = "success" | "error" | "passwordsNotEqual" | null;
 
-type patientData = {
+export type patient = {
   id: number;
   login: string;
   last_name: string;
@@ -30,12 +30,14 @@ type patientData = {
   snils_number: number;
 };
 
-type appointment = {
+export type appointment = {
   date: Date;
   cabinet_number: number;
+  id_specialization: number;
   specialization: string;
   time_id: number;
   time: string;
+  doctor_id: number;
   last_name: string;
   first_name: string;
   second_name: string;
@@ -49,12 +51,11 @@ type appointmentData = {
 };
 
 const ProfilePage = () => {
-  const navigate = useNavigate();
+  const { state } = useLocation();
   const [cookies] = useCookies(["Access_token"]);
   const [part, setPart] = useState<profilePart>("data");
-  const [infoCard, setInfoCard] = useState<infoCardType>(null);
-  const [patient, setPatient] = useState<patientData | null>();
-  const [appointments, setAppointments] = useState<appointment[] | null>([]);
+  const [patient, setPatient] = useState<patient | null>();
+  const [appointments, setAppointments] = useState<appointment[]>([]);
 
   const [newPassword, setNewPassword] = useState<string>("");
   const [newPasswordCopy, setNewPasswordCopy] = useState<string>("");
@@ -87,7 +88,7 @@ const ProfilePage = () => {
       });
     },
     onSuccess: (res) => {
-      setAppointments(res.data["appointments"]);
+      setAppointments(res.data["appointments"] ? res.data["appointments"] : []);
     },
   });
 
@@ -98,6 +99,42 @@ const ProfilePage = () => {
         method: "patch",
         url: "http://localhost:8080/appointment/cancelAppointment",
         data: appointmentData,
+      });
+    },
+    onSuccess: () => {
+      Store.addNotification({
+        title: "Успех",
+        message: "Запись на приём была успешно отменена",
+        insert: "top",
+        container: "bottom-right",
+        type: "info",
+        animationIn: ["animate__animated", "animate__fadeIn"],
+        animationOut: ["animate__animated", "animate__fadeOut"],
+        dismiss: {
+          duration: 5000,
+          onScreen: true,
+        },
+      });
+      setNewPassword("");
+      setNewPasswordCopy("");
+      setAppointments(
+        appointments.filter((_, index) => index !== openedAppointmentId)
+      );
+    },
+    onError: (error: AxiosError) => {
+      let err: Error = error.response?.data as Error;
+      Store.addNotification({
+        title: "Ошибка",
+        message: err.Error[0].toUpperCase() + err.Error.slice(1),
+        insert: "top",
+        container: "bottom-right",
+        type: "danger",
+        animationIn: ["animate__animated", "animate__fadeIn"],
+        animationOut: ["animate__animated", "animate__fadeOut"],
+        dismiss: {
+          duration: 5000,
+          onScreen: true,
+        },
       });
     },
   });
@@ -112,31 +149,72 @@ const ProfilePage = () => {
       });
     },
     onSuccess: () => {
-      setInfoCard("success");
+      Store.addNotification({
+        title: "Успех",
+        message: "Пароль был успешно изменён",
+        insert: "top",
+        container: "bottom-right",
+        type: "info",
+        animationIn: ["animate__animated", "animate__fadeIn"],
+        animationOut: ["animate__animated", "animate__fadeOut"],
+        dismiss: {
+          duration: 5000,
+          onScreen: true,
+        },
+      });
+      setNewPassword("");
+      setNewPasswordCopy("");
     },
-    onError: () => {
-      setInfoCard("error");
+    onError: (error: AxiosError) => {
+      let err: Error = error.response?.data as Error;
+      Store.addNotification({
+        title: "Ошибка",
+        message: err.Error[0].toUpperCase() + err.Error.slice(1),
+        insert: "top",
+        container: "bottom-right",
+        type: "danger",
+        animationIn: ["animate__animated", "animate__fadeIn"],
+        animationOut: ["animate__animated", "animate__fadeOut"],
+        dismiss: {
+          duration: 5000,
+          onScreen: true,
+        },
+      });
     },
   });
 
-  const showInfoCard = (type: string | null) => {
-    switch (type) {
-      case "success":
-        return <InfoCard text="Пароль успешно изменён" />;
-      case "error":
-        return <InfoCard text="Что-то пошло не так" type="error" />;
-      case "passwordsNotEqual":
-        return <InfoCard text="Пароли не совпадают" type="error" />;
-      default:
-        return null;
+  useEffect(() => {
+    if (state) {
+      setPart(state.part);
+      console.log("Успех", state.part);
+      Store.addNotification({
+        title: "Успех",
+        message: "Вы были успешно записаны на приём",
+        insert: "top",
+        container: "bottom-right",
+        type: "info",
+        animationIn: ["animate__animated", "animate__fadeIn"],
+        animationOut: ["animate__animated", "animate__fadeOut"],
+        dismiss: {
+          duration: 5000,
+          onScreen: true,
+        },
+      });
     }
-  };
+  }, []);
 
   useEffect(() => {
-    if (part === "data") {
-      getPatientData.mutate();
-    } else {
-      getPatientAppointments.mutate();
+    switch (part) {
+      case "data":
+        getPatientData.mutate();
+        break;
+      case "appointments":
+        getPatientAppointments.mutate();
+        break;
+      case "changePassword":
+        setNewPassword("");
+        setNewPasswordCopy("");
+        break;
     }
   }, [part]);
 
@@ -203,7 +281,6 @@ const ProfilePage = () => {
               width="100%"
               onClick={() => {
                 setPart("changePassword");
-                setInfoCard(null);
               }}
             />
             {}
@@ -215,7 +292,7 @@ const ProfilePage = () => {
           return <Loading />;
         }
 
-        if (appointments == null) {
+        if (appointments.length == 0) {
           return <InfoCard text="В данный момент у Вас нет активных записей" />;
         }
 
@@ -265,13 +342,15 @@ const ProfilePage = () => {
                       time={time}
                       cabinetNumber={cabinet_number}
                       isOpened={openedAppointmentId === index}
-                      onClick={() =>
+                      onClick={(event) => {
                         cancelAppointment.mutate({
                           date,
                           cabinet_number,
                           time_id,
-                        })
-                      }
+                        });
+
+                        event?.stopPropagation();
+                      }}
                     />
                   </div>
                 );
@@ -285,11 +364,13 @@ const ProfilePage = () => {
           <>
             <Input
               type="password"
+              value={newPassword}
               placeholder="Введите новый пароль"
               onChange={(event) => setNewPassword(event.target.value)}
             />
             <Input
               type="password"
+              value={newPasswordCopy}
               placeholder="Введите новый пароль ещё раз"
               onChange={(event) => setNewPasswordCopy(event.target.value)}
             />
@@ -300,11 +381,22 @@ const ProfilePage = () => {
                 if (newPassword === newPasswordCopy) {
                   changePassword.mutate(newPassword);
                 } else {
-                  setInfoCard("passwordsNotEqual");
+                  Store.addNotification({
+                    title: "Ошибка",
+                    message: "Пароли не совпадают",
+                    insert: "top",
+                    container: "bottom-right",
+                    type: "danger",
+                    animationIn: ["animate__animated", "animate__fadeIn"],
+                    animationOut: ["animate__animated", "animate__fadeOut"],
+                    dismiss: {
+                      duration: 5000,
+                      onScreen: true,
+                    },
+                  });
                 }
               }}
             />
-            {showInfoCard(infoCard)}
           </>
         );
       }
