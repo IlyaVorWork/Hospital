@@ -26,22 +26,25 @@ func main() {
 	db := repositories.ConnectDB()
 
 	authRepo := repositories.NewAuthRepository(db)
-	specRepo := repositories.NewSpecializationRepository(db)
+	dataRepo := repositories.NewDataRepository(db)
 	doctorRepo := repositories.NewDoctorRepository(db)
-	scheduleRepo := repositories.NewScheduleRepository(db)
 	cabinetRepo := repositories.NewCabinetRepository(db)
+	appointmentRepo := repositories.NewAppointmentRepository(db)
+	scheduleRepo := repositories.NewScheduleRepository(db)
 
 	authService := service.NewAuthService(authRepo)
-	specService := service.NewSpecializationService(specRepo)
+	dataService := service.NewDataService(dataRepo)
 	doctorService := service.NewDoctorService(doctorRepo)
 	scheduleService := service.NewScheduleService(scheduleRepo)
 	cabinetService := service.NewCabinetService(cabinetRepo)
+	appointmentService := service.NewAppointmentService(appointmentRepo)
 
 	authHandler := api.NewAuthHandler(authService)
-	specHandler := api.NewSpecializationHandler(specService)
+	dataHandler := api.NewDataHandler(dataService)
 	doctorHandler := api.NewDoctorHandler(doctorService)
 	scheduleHandler := api.NewScheduleHandler(scheduleService)
 	cabinetHandler := api.NewCabinetHandler(cabinetService)
+	appointmentHandler := api.NewAppointmentHandler(appointmentService)
 
 
 	r.Use(cors.New(cors.Config{
@@ -53,34 +56,19 @@ func main() {
         MaxAge: 12 * time.Hour,
     }))
 
-
 	auth := r.Group("/auth")
 	{
-		auth.POST("/register", authHandler.Register)
-		auth.POST("/login", authHandler.Login)
-		auth.GET("/getPatientData", authHandler.GetPatientData)
+		auth.POST("/register", authHandler.RegisterPatient)
+		auth.POST("/login", authHandler.LoginUser)
 		auth.PATCH("/changePassword", authHandler.ChangePassword)
+		auth.GET("/getPatientData", authHandler.GetPatientData)
 		auth.GET("/getPatients", authHandler.GetPatients)
 	}
 
-	appoint := r.Group("/appointment")
+	data := r.Group("/data")
 	{
-		appoint.GET("/specializations", specHandler.GetSpecializationsWithFreeTickets)
-		appoint.GET("/doctors", doctorHandler.GetDoctorsBySpec)
-		appoint.GET("/tickets", scheduleHandler.GetFreeTickets)
-		appoint.POST("/makeAppointment", scheduleHandler.MakeAppointment)
-		appoint.GET("/getPatientAppointments", scheduleHandler.GetAppointmentsByPatientId)
-		appoint.GET("/getAppointments", scheduleHandler.GetAppointments)
-		appoint.PATCH("/cancelAppointment", scheduleHandler.CancelAppointment)
-		appoint.POST("/getFreeTimes", scheduleHandler.GetFreeTimes)
-		appoint.POST("/makeSchedule", scheduleHandler.MakeSchedule)
-		appoint.POST("/getSchedule", scheduleHandler.GetSchedule)
-		appoint.DELETE("/deleteSchedule", scheduleHandler.DeleteSchedule)
-	}
-
-	specialization := r.Group("/specialization")
-	{
-		specialization.GET("/getSpecs", specHandler.GetSpecializations)
+		data.GET("/getGenders", dataHandler.GetGenders)
+		data.GET("/getSpecializations", dataHandler.GetSpecializationsWithFreeTickets)
 	}
 
 	cabinet := r.Group("/cabinet")
@@ -94,11 +82,27 @@ func main() {
 	doctor := r.Group("/doctor")
 	{
 		doctor.GET("/getDoctors", doctorHandler.GetDoctors)
+		doctor.GET("/getDoctorsBySpecializationId", doctorHandler.GetDoctorsBySpec)
 		doctor.POST("/addDoctor", doctorHandler.AddDoctor)
 		doctor.PATCH("/editDoctor", doctorHandler.EditDoctor)
 		doctor.DELETE("/deleteDoctor", doctorHandler.DeleteDoctor)
 	}
 
+	schedule := r.Group("/schedule")
+	{
+		schedule.POST("/getFreeTimes", scheduleHandler.GetFreeTimes)
+		schedule.POST("/getSchedule", scheduleHandler.GetSchedule)
+		schedule.POST("/makeSchedule", scheduleHandler.MakeSchedule)
+		schedule.DELETE("/deleteSchedule", scheduleHandler.DeleteSchedule)
+	}
+
+	appointment := r.Group("/appointment")
+	{
+		appointment.POST("/makeAppointment", appointmentHandler.MakeAppointment)
+		appointment.GET("/getFreeAppointments", appointmentHandler.GetFreeAppointments)
+		appointment.GET("/getAppointmentsByPatientId", appointmentHandler.GetAppointmentsByPatientId)
+		appointment.PATCH("/cancelAppointment", appointmentHandler.CancelAppointment)
+	}
 
 	err := r.Run()
 	if err != nil {

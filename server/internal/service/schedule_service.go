@@ -6,14 +6,10 @@ import (
 )
 
 type ScheduleRepositoryInterface interface {
-	GetFreeTickets(id_doctor int) ([]models.Ticket, error)
-	MakeAppointment(AppointData models.MakeAppointDTO) error
-	GetAppointmentsByPatientId(patient_id int) ([]models.Appointment, error)
-	CancelAppointment(CancelAppointData models.CancelAppointDTO) error
-	GetFreeTimes(ScheduleData models.GetFreeTimesDTO) ([]models.Time, error)
+	GetFreeTimes(data models.GetFreeTimesDTO) ([]models.Time, error)
 	GetFreeCabinets(spec_id, time_id int, date time.Time) ([]models.Cabinet, error)
 	MakeSchedule(time_id, cabinet_number, doctor_id  int, date time.Time) error
-	GetSchedule(ScheduleData models.GetScheduleDTO) ([]models.Time, error)
+	GetSchedule(data models.GetScheduleDTO) ([]models.Time, error)
 	DeleteSchedule(time_id, doctor_id int, date time.Time) error
 }
 
@@ -25,46 +21,8 @@ func NewScheduleService(repo ScheduleRepositoryInterface) *ScheduleService {
 	return &ScheduleService{repo: repo}
 }
 
-func (service ScheduleService) GetFreeTickets(id_doctor int) ([]models.Ticket, error) {
-	
-	doctors, err := service.repo.GetFreeTickets(id_doctor)
-	if err != nil {
-		return nil, err
-	}
-
-	return doctors, err
-}
-
-func (service ScheduleService) MakeAppointment(AppointData models.MakeAppointDTO) error {
-	
-	err := service.repo.MakeAppointment(AppointData)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (service ScheduleService) GetAppointmentsByPatientId(patient_id int) ([]models.Appointment, error) {
-	appointments, err := service.repo.GetAppointmentsByPatientId(patient_id)
-	if err != nil {
-		return nil, err
-	}
-
-	return appointments, nil
-}
-
-func (service ScheduleService) CancelAppointment(CancelAppointData models.CancelAppointDTO) error {
-	err := service.repo.CancelAppointment(CancelAppointData)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (service ScheduleService) GetFreeTimes(ScheduleData models.GetFreeTimesDTO) ([]models.Time, error) {
-	times, err := service.repo.GetFreeTimes(ScheduleData)
+func (service ScheduleService) GetFreeTimes(data models.GetFreeTimesDTO) ([]models.Time, error) {
+	times, err := service.repo.GetFreeTimes(data)
 	if err != nil {
 		return nil, err
 	}
@@ -72,15 +30,15 @@ func (service ScheduleService) GetFreeTimes(ScheduleData models.GetFreeTimesDTO)
 	return times, nil
 }
 
-func (service ScheduleService) MakeSchedule(ScheduleData models.MakeScheduleDTO) error {
+func (service ScheduleService) MakeSchedule(data models.MakeScheduleDTO) error {
 	
-	for _, time := range ScheduleData.Time_ids {
-		cabinets, err := service.repo.GetFreeCabinets(ScheduleData.Specialization_id, time, ScheduleData.Date)
+	for _, time := range data.Time_ids {
+		cabinets, err := service.repo.GetFreeCabinets(data.Specialization_id, time, data.Date)
 		if err != nil {
 			return err
 		}
 
-		err = service.repo.MakeSchedule(time, cabinets[0].Number, ScheduleData.Doctor_id, ScheduleData.Date)
+		err = service.repo.MakeSchedule(time, cabinets[0].Number, data.Doctor_id, data.Date)
 		if err != nil {
 			return err
 		}
@@ -89,9 +47,9 @@ func (service ScheduleService) MakeSchedule(ScheduleData models.MakeScheduleDTO)
 	return nil
 }
 
-func (service ScheduleService) GetSchedule(ScheduleData models.GetScheduleDTO) ([]models.Time, error) {
+func (service ScheduleService) GetSchedule(data models.GetScheduleDTO) ([]models.Time, error) {
 	
-	times, err := service.repo.GetSchedule(ScheduleData)
+	times, err := service.repo.GetSchedule(data)
 	if err != nil {
 		return nil, err
 	}
@@ -99,9 +57,9 @@ func (service ScheduleService) GetSchedule(ScheduleData models.GetScheduleDTO) (
 	return times, nil
 }
 
-func (service ScheduleService) DeleteSchedule(ScheduleData models.DeleteScheduleDTO) error {
-	for _, time := range ScheduleData.Time_ids {
-		err := service.repo.DeleteSchedule(time, ScheduleData.Doctor_id, ScheduleData.Date)
+func (service ScheduleService) DeleteSchedule(data models.DeleteScheduleDTO) error {
+	for _, time := range data.Time_ids {
+		err := service.repo.DeleteSchedule(time, data.Doctor_id, data.Date)
 		if err != nil {
 			return err
 		}

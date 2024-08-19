@@ -11,4 +11,5 @@ var (
 	ErrUnexistingLogin = errors.New("пользователя с таким логином не существует")
 	ErrActionNotAllowed = errors.New("вы не можете совершить это действие")
 	ErrNoPatientWithSuchId = errors.New("пациента с таким id не существует")
+	ErrExistingCabinet = errors.New("кабинет с таким номером уже существует")
 )

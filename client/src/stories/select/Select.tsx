@@ -42,6 +42,8 @@ const title = (name: string) => {
       return "Выберите врача";
     case "patient":
       return "Выберите пациента";
+    case "gender":
+      return "Выберите пол";
   }
 };
 

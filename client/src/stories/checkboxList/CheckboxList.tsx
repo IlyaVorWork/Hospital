@@ -2,11 +2,16 @@ import { Dispatch, SetStateAction, useState } from "react";
 import Input, { InputProps } from "../input/Input";
 import "./checkboxList.css";
 
+export interface CheckboxListOptionProps {
+  value: number | string;
+  placeholder: string;
+}
+
 export interface CheckboxListProps {
   /**
    * Select options
    */
-  options?: InputProps[];
+  options?: CheckboxListOptionProps[];
   /**
    * Checked values array
    */
@@ -29,7 +34,9 @@ const CheckboxList = ({
           <Input
             type="checkbox"
             placeholder={el.placeholder}
-            isChecked={checkedValues.includes(parseInt(el.value))}
+            isChecked={checkedValues.includes(
+              typeof el.value === "string" ? parseInt(el.value) : el.value
+            )}
             value={el.value}
             onChange={(event) =>
               setValues!((prev) =>

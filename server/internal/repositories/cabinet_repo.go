@@ -7,8 +7,9 @@ import (
 
 var (
 	GET_CABINETS = "SELECT * FROM cabinet ORDER BY number"
-	ADD_CABINET = "INSERT INTO public.cabinet(number, id_specialization) VALUES ($1, $2)"
-	UPDATE_CABINET = "UPDATE public.cabinet SET id_specialization=$1 WHERE number=$2"
+	IS_CABINET_EXISTS = "SELECT * FROM cabinet WHERE number = $1"
+	ADD_CABINET = "INSERT INTO public.cabinet(number, specialization_id) VALUES ($1, $2)"
+	UPDATE_CABINET = "UPDATE public.cabinet SET specialization_id=$1 WHERE number=$2"
 	DELETE_CABINET = "DELETE FROM public.cabinet WHERE number=$1"
 )
 
@@ -30,7 +31,7 @@ func (repo CabinetRepository) GetCabinets() ([]models.Cabinet, error) {
 
 	for rows.Next() {
 		var cabinet models.Cabinet
-		err = rows.Scan(&cabinet.Number, &cabinet.Id_specialization)
+		err = rows.Scan(&cabinet.Number, &cabinet.Specialization_id)
 		if err != nil {
 			return nil, err
 		}
@@ -40,8 +41,19 @@ func (repo CabinetRepository) GetCabinets() ([]models.Cabinet, error) {
 	return cabinets, nil
 }
 
+func (repo CabinetRepository) IsCabinetExists(cabinet_number int) error {
+	var cabinet models.Cabinet
+
+	err := repo.db.QueryRow(IS_CABINET_EXISTS, cabinet_number).Scan(&cabinet.Number, &cabinet.Specialization_id)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (repo CabinetRepository) AddCabinet(cabinet models.Cabinet) error {
-	_, err := repo.db.Exec(ADD_CABINET, cabinet.Number, cabinet.Id_specialization)
+	_, err := repo.db.Exec(ADD_CABINET, cabinet.Number, cabinet.Specialization_id)
 	if err != nil {
 		return err
 	}
@@ -50,7 +62,7 @@ func (repo CabinetRepository) AddCabinet(cabinet models.Cabinet) error {
 }
 
 func (repo CabinetRepository) EditCabinet(cabinet models.Cabinet) error {
-	_, err := repo.db.Exec(UPDATE_CABINET, cabinet.Id_specialization, cabinet.Number)
+	_, err := repo.db.Exec(UPDATE_CABINET, cabinet.Specialization_id, cabinet.Number)
 	if err != nil {
 		return err
 	}
@@ -58,8 +70,8 @@ func (repo CabinetRepository) EditCabinet(cabinet models.Cabinet) error {
 	return nil
 }
 
-func (repo CabinetRepository) DeleteCabinet(cabinet models.DeleteCabinetDTO) error {
-	_, err := repo.db.Exec(DELETE_CABINET, cabinet.Number)
+func (repo CabinetRepository) DeleteCabinet(data models.DeleteCabinetDTO) error {
+	_, err := repo.db.Exec(DELETE_CABINET, data.Number)
 	if err != nil {
 		return err
 	}

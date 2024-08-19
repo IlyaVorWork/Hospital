@@ -13,9 +13,9 @@ import (
 type AuthRepositoryInterface interface {
 	GetPatientData(id int) (models.Patient, error)
 	IsUserExists(role, login string) error
-	Login(loginData models.LoginDTO) (models.User, error)
-	Register(user models.RegisterDTO, password []byte) error
-	ChangePassword(patient_id int, passHash []byte) error
+	LoginUser(data models.LoginDTO) (models.User, error)
+	RegisterPatient(data models.RegisterDTO, password []byte) error
+	ChangePassword(patient_id int, pass_hash []byte) error
 	GetPatients() ([]models.Patient, error)
 }
 
@@ -27,22 +27,22 @@ func NewAuthService(repo AuthRepositoryInterface) *AuthService {
 	return &AuthService{repo: repo}
 }
 
-func (service AuthService) Login(loginData models.LoginDTO) (string, error) {
-	err := service.repo.IsUserExists(loginData.Role, loginData.Login)
+func (service AuthService) LoginUser(data models.LoginDTO) (string, error) {
+	err := service.repo.IsUserExists(data.Role, data.Login)
 	if err != nil {
 		return "", err
 	}
 
-	userData, err := service.repo.Login(loginData)
+	user, err := service.repo.LoginUser(data)
 	if err != nil {
 		return "", err
 	}
 
 	payload := jwt.MapClaims{
 		"exp":   time.Now().Add(time.Minute * 60).Unix(),
-		"id": 	 userData.Id,
-		"login": userData.Login,
-		"role": loginData.Role,
+		"id": 	 user.Id,
+		"login": user.Login,
+		"role": data.Role,
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, payload)
@@ -57,18 +57,18 @@ func (service AuthService) Login(loginData models.LoginDTO) (string, error) {
 	return t, err
 }
 
-func (service AuthService) Register(patient models.RegisterDTO) error {
-	err := service.repo.IsUserExists("patient", patient.Login)
+func (service AuthService) RegisterPatient(data models.RegisterDTO) error {
+	err := service.repo.IsUserExists("patient", data.Login)
 	if err == nil {
 		return custom_errors.ErrExistingLogin
 	}
 
-	passHash, err := bcrypt.GenerateFromPassword([]byte(patient.Password), 14)
+	pass_hash, err := bcrypt.GenerateFromPassword([]byte(data.Password), 14)
 	if err != nil {
 		return err
 	}
 
-	err = service.repo.Register(patient, passHash)
+	err = service.repo.RegisterPatient(data, pass_hash)
 	if err != nil {
 		return err
 	}
@@ -86,14 +86,14 @@ func (service AuthService) GetPatientData(id int) (models.Patient, error) {
 	return userData, nil
 }
 
-func (service AuthService) ChangePassword(patient_id int, password string) error {
+func (service AuthService) ChangePassword(data models.ChangePasswordDTO) error {
 	
-	passHash, err := bcrypt.GenerateFromPassword([]byte(password), 14)
+	pass_hash, err := bcrypt.GenerateFromPassword([]byte(data.Password), 14)
 	if err != nil {
 		return err
 	}
 
-	err = service.repo.ChangePassword(patient_id, passHash)
+	err = service.repo.ChangePassword(data.Patient_Id, pass_hash)
 	if err != nil {
 		return err
 	}
@@ -109,3 +109,4 @@ func (service AuthService) GetPatients() ([]models.Patient, error) {
 
 	return patients, nil
 }
+

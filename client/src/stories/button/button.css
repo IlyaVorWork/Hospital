@@ -12,6 +12,11 @@
     all,
     ease 0.25s;
 }
+.button:disabled:hover {
+  cursor: default;
+  box-shadow: rgba(0, 0, 0, 0.25) 0px 0px 4px 0px;
+  background-color: white;
+}
 .button:hover {
   box-shadow: rgba(0, 0, 0, 0.25) 0px 0px 8px 2px;
   background-color: #b1f5ef;

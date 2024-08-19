@@ -15,6 +15,10 @@ export interface ButtonProps {
    */
   warning?: boolean;
   /**
+   * Is button disabled?
+   */
+  disabled?: boolean;
+  /**
    * Button width
    */
   width?: string;
@@ -35,6 +39,7 @@ const Button = ({
   active = false,
   header = false,
   warning = false,
+  disabled,
   label,
   width,
   onClick,
@@ -47,6 +52,7 @@ const Button = ({
     <button
       type="button"
       className={["button", isActive, isHeader, isWarning].join(" ")}
+      disabled={disabled}
       style={{ width: width }}
       onClick={onClick}
       {...props}>

@@ -1,11 +1,13 @@
 import React from "react";
 import "./input.css";
 
+type InputType = "text" | "date" | "password" | "checkbox";
+
 export interface InputProps {
   /**
    * Type of input
    */
-  type?: string;
+  type: InputType;
   /**
    * Input placeholder
    */
@@ -14,6 +16,10 @@ export interface InputProps {
    * Is option checked for input type checkbox
    */
   isChecked?: boolean;
+  /**
+   * Is input invalid?
+   */
+  invalid?: boolean;
   /**
    * Input value
    */
@@ -31,15 +37,17 @@ const Input = ({
   type,
   placeholder,
   isChecked,
+  invalid,
   value,
   onChange,
   ...props
 }: InputProps) => {
   {
+    let isInvalid = invalid ? "invalid" : "";
     switch (type) {
       case "password":
         return (
-          <div className="input">
+          <div className={["input", isInvalid].join(" ")}>
             <input
               type="password"
               placeholder={placeholder}
@@ -53,7 +61,6 @@ const Input = ({
           <div className="input">
             <input
               type="date"
-              placeholder={placeholder}
               onChange={onChange}
               value={
                 value && typeof value != "string"
@@ -61,17 +68,6 @@ const Input = ({
                   : ""
               }
               //min={new Date().toISOString().split("T")[0]}
-            />
-          </div>
-        );
-      case "email":
-        return (
-          <div className="input">
-            <input
-              type="email"
-              placeholder={placeholder}
-              onChange={onChange}
-              value={value}
             />
           </div>
         );
@@ -90,9 +86,9 @@ const Input = ({
             </div>
           </div>
         );
-      default:
+      case "text":
         return (
-          <div className="input">
+          <div className={["input", isInvalid].join(" ")}>
             <input
               type="text"
               placeholder={placeholder}

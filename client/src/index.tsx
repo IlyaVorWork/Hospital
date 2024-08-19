@@ -8,21 +8,29 @@ import {
   RouterProvider,
 } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "react-query";
-import LoginPage, { tokenClaims } from "./LoginPage";
 import { Cookies, CookiesProvider } from "react-cookie";
-import AppointmentPage from "./AppointmentPage";
-import ProfilePage from "./ProfilePage";
 import { jwtDecode } from "jwt-decode";
-import NotFoundPage from "./NotFoundPage";
-import CabinetPage from "./CabinetsPage";
-import DoctorsPage from "./DoctorsPage";
-import ManageAppointmentsPage from "./ManageAppointmentsPage";
-import SchedulePage from "./SchedulePage";
+import NotFoundPage from "./pages/NotFoundPage";
+import CabinetPage from "./pages/CabinetsPage";
+import DoctorsPage from "./pages/DoctorsPage";
+import ManageAppointmentsPage from "./pages/ManageAppointmentsPage";
+import SchedulePage from "./pages/SchedulePage";
+import { TokenClaims } from "./types/Auth.types";
+import LoginPage from "./pages/LoginPage";
+import AppointmentPage from "./pages/AppointmentPage";
+import ProfilePage from "./pages/ProfilePage";
+import PatientsPage from "./pages/PatientsPage";
 
 const queryClient = new QueryClient();
 const cookies = new Cookies();
 
-const adminAllowedPaths = ["cabinets", "doctors", "schedule", "appointments"];
+const adminAllowedPaths = [
+  "patients",
+  "cabinets",
+  "doctors",
+  "schedule",
+  "appointments",
+];
 const patientAllowedPaths = ["makeAppointment", "profile"];
 
 const isLoggedIn = async ({ request }: LoaderFunctionArgs) => {
@@ -35,7 +43,7 @@ const isLoggedIn = async ({ request }: LoaderFunctionArgs) => {
   if (!accessToken) {
     return redirect("/login");
   }
-  let claims: tokenClaims = jwtDecode(accessToken);
+  let claims: TokenClaims = jwtDecode(accessToken);
   if (claims.exp * 1000 < new Date().getTime()) {
     cookies.remove("Access_token");
     return redirect("/login");
@@ -77,6 +85,11 @@ const router = createBrowserRouter([
       {
         path: "profile",
         element: <ProfilePage />,
+        loader: isLoggedIn,
+      },
+      {
+        path: "patients",
+        element: <PatientsPage />,
         loader: isLoggedIn,
       },
       {

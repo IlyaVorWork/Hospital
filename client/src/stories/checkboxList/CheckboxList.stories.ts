@@ -24,33 +24,43 @@ export const Default: Story = {
     options: [
       {
         value: "1",
+        placeholder: "1",
       },
       {
         value: "2",
+        placeholder: "2",
       },
       {
         value: "3",
+        placeholder: "3",
       },
       {
         value: "4",
+        placeholder: "4",
       },
       {
         value: "5",
+        placeholder: "5",
       },
       {
         value: "6",
+        placeholder: "6",
       },
       {
         value: "7",
+        placeholder: "7",
       },
       {
         value: "8",
+        placeholder: "8",
       },
       {
         value: "9",
+        placeholder: "9",
       },
       {
         value: "10",
+        placeholder: "10",
       },
     ],
   },

@@ -40,13 +40,6 @@ export const Date: Story = {
   },
 };
 
-export const Email: Story = {
-  args: {
-    type: "email",
-    placeholder: "Введите почту",
-  },
-};
-
 export const Checkbox: Story = {
   args: {
     type: "checkbox",

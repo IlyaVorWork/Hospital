@@ -11,7 +11,7 @@ type CabinetServiceInterface interface {
 	GetCabinets() ([]models.Cabinet, error)
 	AddCabinet(cabinet models.Cabinet) error
 	EditCabinet(cabinet models.Cabinet) error 
-	DeleteCabinet(cabinet models.DeleteCabinetDTO) error
+	DeleteCabinet(data models.DeleteCabinetDTO) error
 }
 
 type CabinetHandler struct {
@@ -26,13 +26,13 @@ func (handler *CabinetHandler) GetCabinets(c *gin.Context) {
 	
 	_, err := VerifyToken(c, "admin")
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"Error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
 	cabinets, err := handler.service.GetCabinets()
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"Error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -43,20 +43,20 @@ func (handler *CabinetHandler) AddCabinet(c *gin.Context) {
 
 	_, err := VerifyToken(c, "admin")
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"Error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	var queryData models.Cabinet
-	err = c.ShouldBindJSON(&queryData)
+	var query_data models.Cabinet
+	err = c.ShouldBindJSON(&query_data)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"Error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	err = handler.service.AddCabinet(queryData)
+	err = handler.service.AddCabinet(query_data)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"Error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -67,20 +67,20 @@ func (handler *CabinetHandler) EditCabinet(c *gin.Context) {
 
 	_, err := VerifyToken(c, "admin")
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"Error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	var queryData models.Cabinet
-	err = c.ShouldBindJSON(&queryData)
+	var query_data models.Cabinet
+	err = c.ShouldBindJSON(&query_data)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"Error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	err = handler.service.EditCabinet(queryData)
+	err = handler.service.EditCabinet(query_data)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"Error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -91,20 +91,20 @@ func (handler *CabinetHandler) DeleteCabinet(c *gin.Context) {
 
 	_, err := VerifyToken(c, "admin")
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"Error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	var queryData models.DeleteCabinetDTO
-	err = c.ShouldBindJSON(&queryData)
+	var query_data models.DeleteCabinetDTO
+	err = c.ShouldBindJSON(&query_data)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"Error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	err = handler.service.DeleteCabinet(queryData)
+	err = handler.service.DeleteCabinet(query_data)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"Error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 

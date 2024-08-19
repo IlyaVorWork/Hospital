@@ -1,12 +1,12 @@
 import { ReactElement, useEffect, useState } from "react";
-import Header from "./stories/header/Header";
-import { ButtonProps } from "./stories/button/Button";
 import "./layout.css";
 import { useCookies } from "react-cookie";
 import { jwtDecode } from "jwt-decode";
-import { redirect, useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useMatches, useNavigate } from "react-router-dom";
 import { ReactNotifications } from "react-notifications-component";
 import "react-notifications-component/dist/theme.css";
+import { ButtonProps } from "../button/Button";
+import Header from "../header/Header";
 
 interface LayoutProps {
   children: ReactElement;
@@ -30,6 +30,7 @@ const Layout = ({ children, ...props }: LayoutProps) => {
   const [accessToken, _, removeAcccessToken] = useCookies(["Access_token"]);
   const navigate = useNavigate();
   const location = useLocation();
+  const matches = useMatches();
 
   let currentPath = location.pathname.split("/").pop();
 
@@ -63,6 +64,14 @@ const Layout = ({ children, ...props }: LayoutProps) => {
   ];
 
   const adminMenu: ButtonProps[] = [
+    {
+      header: true,
+      label: "Пациенты",
+      active: currentPath === "patients",
+      onClick: () => {
+        navigate("/patients");
+      },
+    },
     {
       header: true,
       label: "Кабинеты",
@@ -111,6 +120,8 @@ const Layout = ({ children, ...props }: LayoutProps) => {
   };
 
   useEffect(() => {
+    document.title = currentPath![0].toUpperCase() + currentPath?.slice(1);
+
     if (accessToken.Access_token) {
       const decodedToken: AccessTokenPayload = jwtDecode(
         accessToken.Access_token

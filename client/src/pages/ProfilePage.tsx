@@ -1,215 +1,113 @@
 import React, { useEffect, useState } from "react";
-import Layout from "./Layout";
-import Input from "./stories/input/Input";
-import Button from "./stories/button/Button";
 import { useMutation } from "react-query";
-import axios, { AxiosError } from "axios";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { useCookies } from "react-cookie";
-import DualTextCard from "./stories/dualTextCard/DualTextCard";
-import AppointmentCard from "./stories/appointmentCard/AppointmentCard";
-import Loading from "./stories/loading/Loading";
-import InfoCard from "./stories/infoCard/InfoCard";
 import { Store } from "react-notifications-component";
-import { Error } from "./LoginPage";
+import { Patient, TokenClaims } from "../types/Auth.types";
+import { Appointment } from "../types/Appointment.types";
+import {
+  ChangePasswordMutation,
+  GetPatientDataMutation,
+} from "../queries/Auth.queries";
+import {
+  CancelAppointmentMutation,
+  GetAppointmentsByPatientIdMutation,
+} from "../queries/Appointment.queries";
+import {
+  CallErrorNotification,
+  CallSuccessNotification,
+} from "../utils/NotificationCall";
+import Loading from "../stories/loading/Loading";
+import InfoCard from "../stories/infoCard/InfoCard";
+import DualTextCard from "../stories/dualTextCard/DualTextCard";
+import Button from "../stories/button/Button";
+import AppointmentCard from "../stories/appointmentCard/AppointmentCard";
+import Input from "../stories/input/Input";
+import Layout from "../stories/layout/Layout";
+import { passwordRegex } from "../utils/FormValidation";
 
-type profilePart = "data" | "appointments" | "changePassword";
-
-export type patient = {
-  id: number;
-  login: string;
-  last_name: string;
-  first_name: string;
-  second_name: string;
-  birth_date: Date;
-  sex_id: number;
-  passport_series: number;
-  passport_number: number;
-  issue_date: Date;
-  issuer: string;
-  snils_number: number;
-};
-
-export type appointment = {
-  date: Date;
-  cabinet_number: number;
-  id_specialization: number;
-  specialization: string;
-  time_id: number;
-  time: string;
-  doctor_id: number;
-  last_name: string;
-  first_name: string;
-  second_name: string;
-  img_url: string;
-};
-
-type appointmentData = {
-  date: Date;
-  cabinet_number: number;
-  time_id: number;
-};
+type ProfilePart = "data" | "appointments" | "changePassword";
 
 const ProfilePage = () => {
   const { state } = useLocation();
   const [cookies] = useCookies(["Access_token"]);
-  const [part, setPart] = useState<profilePart>("data");
-  const [patient, setPatient] = useState<patient | null>();
-  const [appointments, setAppointments] = useState<appointment[]>([]);
+  const [part, setPart] = useState<ProfilePart>("data");
+  const [patient, setPatient] = useState<Patient>({} as Patient);
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
 
   const [newPassword, setNewPassword] = useState<string>("");
   const [newPasswordCopy, setNewPasswordCopy] = useState<string>("");
+  const [newPasswordValid, setNewPasswordValid] = useState({
+    new_password: false,
+    new_password_copy: false,
+  });
 
   const [openedAppointmentId, setOpenedAppointmentId] = useState<number>(-1);
 
-  const changePart = (part: profilePart) => {
+  const changePart = (part: ProfilePart) => {
     setPart(part);
   };
 
-  const getPatientData = useMutation({
-    mutationFn: () => {
-      return axios({
-        headers: { Authorization: cookies.Access_token },
-        method: "get",
-        url: "http://localhost:8080/auth/getPatientData",
-      });
-    },
-    onSuccess: (res) => {
-      setPatient(res.data["patient_data"]);
-    },
-  });
+  const { mutate: MutateGetPatientData, isLoading: GetPatientDataIsLoading } =
+    useMutation(
+      GetPatientDataMutation(cookies.Access_token, (res) => {
+        setPatient(res.data["patient_data"]);
+      })
+    );
 
-  const getPatientAppointments = useMutation({
-    mutationFn: () => {
-      return axios({
-        headers: { Authorization: cookies.Access_token },
-        method: "get",
-        url: "http://localhost:8080/appointment/getPatientAppointments",
-      });
-    },
-    onSuccess: (res) => {
-      setAppointments(res.data["appointments"] ? res.data["appointments"] : []);
-    },
-  });
+  const {
+    mutate: MutateGetAppointmentsByPatientId,
+    isLoading: GetAppointmentsByPatinetIdIsLoading,
+  } = useMutation(
+    GetAppointmentsByPatientIdMutation(
+      cookies.Access_token,
+      patient!.id,
+      (res) => {
+        setAppointments(
+          res.data["appointments"] ? res.data["appointments"] : []
+        );
+      }
+    )
+  );
 
-  const cancelAppointment = useMutation({
-    mutationFn: (appointmentData: appointmentData) => {
-      return axios({
-        headers: { Authorization: cookies.Access_token },
-        method: "patch",
-        url: "http://localhost:8080/appointment/cancelAppointment",
-        data: appointmentData,
-      });
-    },
-    onSuccess: () => {
-      Store.addNotification({
-        title: "Успех",
-        message: "Запись на приём была успешно отменена",
-        insert: "top",
-        container: "bottom-right",
-        type: "info",
-        animationIn: ["animate__animated", "animate__fadeIn"],
-        animationOut: ["animate__animated", "animate__fadeOut"],
-        dismiss: {
-          duration: 5000,
-          onScreen: true,
-        },
-      });
+  const { mutate: MutateChangePassword } = useMutation(
+    ChangePasswordMutation(cookies.Access_token, newPassword, () => {
+      CallSuccessNotification("Пароль был успешно изменён");
       setNewPassword("");
       setNewPasswordCopy("");
-      setAppointments(
-        appointments.filter((_, index) => index !== openedAppointmentId)
-      );
-    },
-    onError: (error: AxiosError) => {
-      let err: Error = error.response?.data as Error;
-      Store.addNotification({
-        title: "Ошибка",
-        message: err.Error[0].toUpperCase() + err.Error.slice(1),
-        insert: "top",
-        container: "bottom-right",
-        type: "danger",
-        animationIn: ["animate__animated", "animate__fadeIn"],
-        animationOut: ["animate__animated", "animate__fadeOut"],
-        dismiss: {
-          duration: 5000,
-          onScreen: true,
-        },
-      });
-    },
-  });
+    })
+  );
 
-  const changePassword = useMutation({
-    mutationFn: (newPassword: string) => {
-      return axios({
-        headers: { Authorization: cookies.Access_token },
-        method: "patch",
-        url: "http://localhost:8080/auth/changePassword",
-        data: { password: newPassword },
-      });
-    },
-    onSuccess: () => {
-      Store.addNotification({
-        title: "Успех",
-        message: "Пароль был успешно изменён",
-        insert: "top",
-        container: "bottom-right",
-        type: "info",
-        animationIn: ["animate__animated", "animate__fadeIn"],
-        animationOut: ["animate__animated", "animate__fadeOut"],
-        dismiss: {
-          duration: 5000,
-          onScreen: true,
-        },
-      });
-      setNewPassword("");
-      setNewPasswordCopy("");
-    },
-    onError: (error: AxiosError) => {
-      let err: Error = error.response?.data as Error;
-      Store.addNotification({
-        title: "Ошибка",
-        message: err.Error[0].toUpperCase() + err.Error.slice(1),
-        insert: "top",
-        container: "bottom-right",
-        type: "danger",
-        animationIn: ["animate__animated", "animate__fadeIn"],
-        animationOut: ["animate__animated", "animate__fadeOut"],
-        dismiss: {
-          duration: 5000,
-          onScreen: true,
-        },
-      });
-    },
-  });
+  const { mutate: MutateCancelAppointment } = useMutation(
+    CancelAppointmentMutation(
+      cookies.Access_token,
+      appointments[openedAppointmentId]
+        ? {
+            date: appointments[openedAppointmentId].date,
+            cabinet_number: appointments[openedAppointmentId].cabinet_number,
+            time_id: appointments[openedAppointmentId].time_id,
+          }
+        : { date: new Date(), cabinet_number: 0, time_id: 0 },
+      () => {
+        CallSuccessNotification("Запись на приём была успешно отменена");
+        setAppointments(
+          appointments.filter((_, index) => index !== openedAppointmentId)
+        );
+      }
+    )
+  );
 
   useEffect(() => {
     if (state) {
       setPart(state.part);
-      console.log("Успех", state.part);
-      Store.addNotification({
-        title: "Успех",
-        message: "Вы были успешно записаны на приём",
-        insert: "top",
-        container: "bottom-right",
-        type: "info",
-        animationIn: ["animate__animated", "animate__fadeIn"],
-        animationOut: ["animate__animated", "animate__fadeOut"],
-        dismiss: {
-          duration: 5000,
-          onScreen: true,
-        },
-      });
+      CallSuccessNotification("Вы были успешно записаны на приём");
     }
   }, []);
 
   useEffect(() => {
     switch (part) {
       case "data":
-        getPatientData.mutate();
-        break;
-      case "appointments":
-        getPatientAppointments.mutate();
+        MutateGetPatientData();
         break;
       case "changePassword":
         setNewPassword("");
@@ -218,14 +116,20 @@ const ProfilePage = () => {
     }
   }, [part]);
 
+  useEffect(() => {
+    if (part === "appointments" && patient.id) {
+      MutateGetAppointmentsByPatientId();
+    }
+  }, [part, patient]);
+
   const partContent = () => {
     switch (part) {
       case "data": {
-        if (getPatientData.isLoading) {
+        if (GetPatientDataIsLoading) {
           return <Loading />;
         }
 
-        if (patient == null) {
+        if (!patient.id) {
           return <InfoCard text="Ошибка: данные не найдены" type="error" />;
         }
 
@@ -288,7 +192,7 @@ const ProfilePage = () => {
         );
       }
       case "appointments": {
-        if (getPatientAppointments.isLoading) {
+        if (GetAppointmentsByPatinetIdIsLoading) {
           return <Loading />;
         }
 
@@ -343,12 +247,7 @@ const ProfilePage = () => {
                       cabinetNumber={cabinet_number}
                       isOpened={openedAppointmentId === index}
                       onClick={(event) => {
-                        cancelAppointment.mutate({
-                          date,
-                          cabinet_number,
-                          time_id,
-                        });
-
+                        MutateCancelAppointment();
                         event?.stopPropagation();
                       }}
                     />
@@ -365,36 +264,40 @@ const ProfilePage = () => {
             <Input
               type="password"
               value={newPassword}
+              invalid={!newPasswordValid.new_password}
               placeholder="Введите новый пароль"
-              onChange={(event) => setNewPassword(event.target.value)}
+              onChange={(event) => {
+                setNewPassword(event.target.value);
+                setNewPasswordValid((prev) => ({
+                  ...prev,
+                  new_password: passwordRegex.test(event.target.value),
+                }));
+              }}
             />
             <Input
               type="password"
               value={newPasswordCopy}
+              invalid={!newPasswordValid.new_password_copy}
               placeholder="Введите новый пароль ещё раз"
-              onChange={(event) => setNewPasswordCopy(event.target.value)}
+              onChange={(event) => {
+                setNewPasswordCopy(event.target.value);
+                setNewPasswordValid((prev) => ({
+                  ...prev,
+                  new_password_copy: event.target.value === newPassword,
+                }));
+              }}
             />
             <Button
               label="Изменить"
               width="100%"
+              disabled={
+                newPasswordValid.new_password &&
+                newPasswordValid.new_password_copy
+                  ? false
+                  : true
+              }
               onClick={() => {
-                if (newPassword === newPasswordCopy) {
-                  changePassword.mutate(newPassword);
-                } else {
-                  Store.addNotification({
-                    title: "Ошибка",
-                    message: "Пароли не совпадают",
-                    insert: "top",
-                    container: "bottom-right",
-                    type: "danger",
-                    animationIn: ["animate__animated", "animate__fadeIn"],
-                    animationOut: ["animate__animated", "animate__fadeOut"],
-                    dismiss: {
-                      duration: 5000,
-                      onScreen: true,
-                    },
-                  });
-                }
+                MutateChangePassword();
               }}
             />
           </>

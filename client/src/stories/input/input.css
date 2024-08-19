@@ -16,7 +16,8 @@
   padding: 10px;
 }
 
-.input input:invalid {
+.invalid input:focus,
+.invalid input:not(:placeholder-shown) {
   border-color: #db3e3e;
 }
 

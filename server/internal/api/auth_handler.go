@@ -1,11 +1,10 @@
 package api
 
 import (
-	"fmt"
 	"net/http"
 	"os"
 	"server/internal/models"
-	customError "server/pkg/custom_errors"
+	CustomError "server/pkg/custom_errors"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
@@ -13,10 +12,10 @@ import (
 )
 
 type AuthServiceInterface interface {
-	Login(loginData models.LoginDTO) (string, error)
-	Register(patient models.RegisterDTO) error
+	LoginUser(data models.LoginDTO) (string, error)
+	RegisterPatient(data models.RegisterDTO) error
 	GetPatientData(id int) (models.Patient, error)
-	ChangePassword(patient_id int, password string) error
+	ChangePassword(data models.ChangePasswordDTO) error
 	GetPatients() ([]models.Patient, error)
 }
 
@@ -33,7 +32,7 @@ func VerifyToken(c *gin.Context, role string) (models.TokenClaims, error) {
 	
 	access_token := c.Request.Header.Get("Authorization")
 	if access_token == "" {
-		return claims, customError.ErrTokenNotProvided
+		return claims, CustomError.ErrTokenNotProvided
 	}
 
 	JWT_SECRET_KEY, _ := os.LookupEnv("JWT_SECRET_KEY")
@@ -42,59 +41,57 @@ func VerifyToken(c *gin.Context, role string) (models.TokenClaims, error) {
 		return []byte(JWT_SECRET_KEY), nil
 	})
 	if err != nil {
-		return claims, customError.ErrInvalidToken
+		return claims, CustomError.ErrInvalidToken
 	}
 
 	expired := claims.VerifyExpiresAt(time.Now().Unix(), true)
 	if !expired {
-		return claims, customError.ErrExpiredToken
+		return claims, CustomError.ErrExpiredToken
 	}
 
 
 	if role != "any" && claims.Role != role {
-		return claims, customError.ErrActionNotAllowed
+		return claims, CustomError.ErrActionNotAllowed
 	}
 
 	return claims, nil
 }
 
-func (handler *AuthHandler) Register(c *gin.Context) {
+func (handler *AuthHandler) RegisterPatient(c *gin.Context) {
 	
 	_, err := VerifyToken(c, "admin")
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"Error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	var queryData models.RegisterDTO
-	err = c.ShouldBindJSON(&queryData)
+	var query_data models.RegisterDTO
+	err = c.ShouldBindJSON(&query_data)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"Error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	fmt.Println(queryData)
-
-	err = handler.service.Register(queryData)
+	err = handler.service.RegisterPatient(query_data)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"Error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
 	c.JSON(http.StatusOK, "пациент успешно зарегистрирован")
 }
 
-func (handler *AuthHandler) Login(c *gin.Context) {
-	var queryData models.LoginDTO
-	err := c.ShouldBindJSON(&queryData)
+func (handler *AuthHandler) LoginUser(c *gin.Context) {
+	var query_data models.LoginDTO
+	err := c.ShouldBindJSON(&query_data)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"Error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	token, err := handler.service.Login(queryData)
+	token, err := handler.service.LoginUser(query_data)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"Error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -103,15 +100,15 @@ func (handler *AuthHandler) Login(c *gin.Context) {
 
 func (handler *AuthHandler) GetPatientData(c *gin.Context) {
 
-	tokenClaims, err := VerifyToken(c, "patient")
+	token_claims, err := VerifyToken(c, "patient")
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"Error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	patientData, err := handler.service.GetPatientData(tokenClaims.Id)
+	patientData, err := handler.service.GetPatientData(token_claims.Id)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"Error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -120,22 +117,24 @@ func (handler *AuthHandler) GetPatientData(c *gin.Context) {
 
 func (handler *AuthHandler) ChangePassword(c *gin.Context) {
 
-	tokenClaims, err := VerifyToken(c, "patient")
+	token_claims, err := VerifyToken(c, "patient")
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"Error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	var queryData models.ChangePasswordDTO
-	err = c.ShouldBindJSON(&queryData)
+	var query_data models.ChangePasswordDTO
+	err = c.ShouldBindJSON(&query_data)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"Error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	err = handler.service.ChangePassword(tokenClaims.Id, queryData.Password)
+	query_data.Patient_Id = token_claims.Id
+
+	err = handler.service.ChangePassword(query_data)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"Error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -146,15 +145,16 @@ func (handler *AuthHandler) GetPatients(c *gin.Context) {
 
 	_, err := VerifyToken(c, "admin")
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"Error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
 	patients, err := handler.service.GetPatients()
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"Error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{"patients": patients})
 }
+
