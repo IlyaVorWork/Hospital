@@ -54,7 +54,6 @@ const AppointmentCard = ({
   ...props
 }: AppointmentCardProps) => {
   let opened = isOpened ? "opened" : "";
-
   return (
     <div className={["appointment", opened].join(" ")}>
       <div className="miniCard">

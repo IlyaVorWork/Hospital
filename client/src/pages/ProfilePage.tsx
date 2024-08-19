@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { Fragment, useEffect, useState } from "react";
 import { useMutation } from "react-query";
 import { useLocation } from "react-router-dom";
 import { useCookies } from "react-cookie";
@@ -95,7 +95,6 @@ const ProfilePage = () => {
 
   useEffect(() => {
     if (state) {
-      console.log("Биба");
       setPart(state.part);
       CallSuccessNotification("Вы были успешно записаны на приём");
     }
@@ -218,7 +217,6 @@ const ProfilePage = () => {
                   date,
                   cabinet_number,
                   specialization,
-                  time_id,
                   time,
                   last_name,
                   first_name,
@@ -228,29 +226,31 @@ const ProfilePage = () => {
                 index
               ) => {
                 return (
-                  <div
-                    onClick={() =>
-                      setOpenedAppointmentId(
-                        openedAppointmentId === index ? -1 : index
-                      )
-                    }>
-                    <AppointmentCard
-                      key={index}
-                      specialization={specialization}
-                      fullName={
-                        last_name + " " + first_name + " " + second_name
-                      }
-                      url={img_url}
-                      date={new Date(date).toLocaleDateString()}
-                      time={time}
-                      cabinetNumber={cabinet_number}
-                      isOpened={openedAppointmentId === index}
-                      onClick={(event) => {
-                        MutateCancelAppointment();
-                        event?.stopPropagation();
-                      }}
-                    />
-                  </div>
+                  <Fragment key={index}>
+                    <div
+                      onClick={() =>
+                        setOpenedAppointmentId(
+                          openedAppointmentId === index ? -1 : index
+                        )
+                      }>
+                      <AppointmentCard
+                        key={index}
+                        specialization={specialization}
+                        fullName={
+                          last_name + " " + first_name + " " + second_name
+                        }
+                        url={img_url}
+                        date={new Date(date).toLocaleDateString()}
+                        time={time}
+                        cabinetNumber={cabinet_number}
+                        isOpened={openedAppointmentId === index}
+                        onClick={(event) => {
+                          MutateCancelAppointment();
+                          event?.stopPropagation();
+                        }}
+                      />
+                    </div>
+                  </Fragment>
                 );
               }
             )}

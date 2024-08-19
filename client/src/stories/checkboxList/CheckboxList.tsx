@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction } from "react";
+import { Dispatch, Fragment, SetStateAction } from "react";
 import Input from "../input/Input";
 import "./checkboxList.css";
 
@@ -29,23 +29,25 @@ const CheckboxList = ({
 }: CheckboxListProps) => {
   return (
     <div className="checkboxList">
-      {options?.map((el) => {
+      {options?.map((el, index) => {
         return (
-          <Input
-            type="checkbox"
-            placeholder={el.placeholder}
-            isChecked={checkedValues.includes(
-              typeof el.value === "string" ? parseInt(el.value) : el.value
-            )}
-            value={el.value}
-            onChange={(event) =>
-              setValues!((prev) =>
-                prev.includes(parseInt(event.target.value))
-                  ? prev.filter((el) => el !== parseInt(event.target.value))
-                  : [...prev, parseInt(event.target.value)]
-              )
-            }
-          />
+          <Fragment key={index}>
+            <Input
+              type="checkbox"
+              placeholder={el.placeholder}
+              isChecked={checkedValues.includes(
+                typeof el.value === "string" ? parseInt(el.value) : el.value
+              )}
+              value={el.value}
+              onChange={(event) =>
+                setValues!((prev) =>
+                  prev.includes(parseInt(event.target.value))
+                    ? prev.filter((el) => el !== parseInt(event.target.value))
+                    : [...prev, parseInt(event.target.value)]
+                )
+              }
+            />
+          </Fragment>
         );
       })}
     </div>

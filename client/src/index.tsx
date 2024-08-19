@@ -34,7 +34,6 @@ const adminAllowedPaths = [
 const patientAllowedPaths = ["makeAppointment", "profile"];
 
 const isLoggedIn = async ({ request }: LoaderFunctionArgs) => {
-  console.log("Проверка авторизации");
   const accessToken = cookies.get("Access_token");
   let destination = request.url.split("/").pop();
   if (!accessToken && destination === "login") {

@@ -121,12 +121,8 @@ const Layout = ({ children, ...props }: LayoutProps) => {
         setMenu(headerButtons.patient);
       }
     }
-  }, [
-    accessToken.Access_token,
-    currentPath,
-    headerButtons.admin,
-    headerButtons.patient,
-  ]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <>

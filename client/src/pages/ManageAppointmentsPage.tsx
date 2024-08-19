@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { Fragment, useEffect, useState } from "react";
 import Select, { SelectOption } from "../stories/select/Select";
 import { useMutation } from "react-query";
 import { useCookies } from "react-cookie";
@@ -114,27 +114,29 @@ const ManageAppointmentsPage = () => {
             index
           ) => {
             return (
-              <div
-                onClick={() =>
-                  setOpenedAppointmentId(
-                    openedAppointmentId === index ? -1 : index
-                  )
-                }>
-                <AppointmentCard
-                  key={index}
-                  specialization={specialization}
-                  fullName={last_name + " " + first_name + " " + second_name}
-                  url={img_url}
-                  date={new Date(date).toLocaleDateString()}
-                  time={time}
-                  cabinetNumber={cabinet_number}
-                  isOpened={openedAppointmentId === index}
-                  onClick={(event) => {
-                    MutateCancelAppointment();
-                    event?.stopPropagation();
-                  }}
-                />
-              </div>
+              <Fragment key={index}>
+                <div
+                  onClick={() =>
+                    setOpenedAppointmentId(
+                      openedAppointmentId === index ? -1 : index
+                    )
+                  }>
+                  <AppointmentCard
+                    key={index}
+                    specialization={specialization}
+                    fullName={last_name + " " + first_name + " " + second_name}
+                    url={img_url}
+                    date={new Date(date).toLocaleDateString()}
+                    time={time}
+                    cabinetNumber={cabinet_number}
+                    isOpened={openedAppointmentId === index}
+                    onClick={(event) => {
+                      MutateCancelAppointment();
+                      event?.stopPropagation();
+                    }}
+                  />
+                </div>
+              </Fragment>
             );
           }
         )}

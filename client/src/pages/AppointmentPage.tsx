@@ -277,6 +277,7 @@ const AppointmentPage = () => {
                   <Button
                     label="Записаться"
                     width="calc(100% - 115px)"
+                    disabled={ticketId !== -1 ? false : true}
                     onClick={() => {
                       MutateMakeAppointment();
                     }}
