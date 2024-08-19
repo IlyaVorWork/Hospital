@@ -11,12 +11,12 @@ import Layout from "../stories/layout/Layout";
 
 const LoginPage = () => {
   const navigate = useNavigate();
-  const [_, setCookies] = useCookies(["Access_token"]);
+  const [, setCookies] = useCookies(["Access_token"]);
   const [role, setRole] = useState<Role>("patient");
   const [login, setLogin] = useState<string>("");
   const [password, setPassword] = useState<string>("");
 
-  const { mutate: mutateLoginUser } = useMutation(
+  const { mutate: MutateLoginUser } = useMutation(
     LoginUserMutation(
       { role: role, login: login, password: password },
       (res) => {
@@ -80,7 +80,7 @@ const LoginPage = () => {
           label="Вход"
           width="100%"
           disabled={login && password ? false : true}
-          onClick={() => mutateLoginUser()}
+          onClick={() => MutateLoginUser()}
         />
       </div>
     </Layout>

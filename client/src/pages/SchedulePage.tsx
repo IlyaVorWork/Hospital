@@ -130,12 +130,14 @@ const SchedulePage = () => {
         ClearForms();
         break;
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [action]);
 
   useEffect(() => {
     if (spec.id) {
       MutateGetDoctorsBySpecializationId();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [spec]);
 
   useEffect(() => {
@@ -151,6 +153,7 @@ const SchedulePage = () => {
         }
         break;
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [date, doctor]);
 
   const currentAction = () => {

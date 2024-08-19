@@ -1,5 +1,5 @@
-import { Dispatch, SetStateAction, useState } from "react";
-import Input, { InputProps } from "../input/Input";
+import { Dispatch, SetStateAction } from "react";
+import Input from "../input/Input";
 import "./checkboxList.css";
 
 export interface CheckboxListOptionProps {

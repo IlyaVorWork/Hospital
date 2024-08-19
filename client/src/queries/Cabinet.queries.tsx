@@ -1,8 +1,5 @@
 import axios, { AxiosError, AxiosResponse } from "axios";
-import {
-  CallErrorNotification,
-  CallSuccessNotification,
-} from "../utils/NotificationCall";
+import { CallErrorNotification } from "../utils/NotificationCall";
 import { ErrorRes } from "../types/Auth.types";
 import { Cabinet } from "../types/Cabinet.types";
 

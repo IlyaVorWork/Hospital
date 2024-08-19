@@ -43,7 +43,7 @@ const AppointmentPage = () => {
   const [time, setTime] = useState<string>("");
 
   const {
-    mutate: mutateGetSpecializations,
+    mutate: MutateGetSpecializations,
     isLoading: getSpecializationsIsLoading,
   } = useMutation(
     GetSpecializationsMutation(cookies.Access_token, (res) => {
@@ -51,7 +51,7 @@ const AppointmentPage = () => {
     })
   );
 
-  const { mutate: mutateGetDoctors, isLoading: getDoctorsIsLoading } =
+  const { mutate: MutateGetDoctors, isLoading: getDoctorsIsLoading } =
     useMutation(
       GetDoctorsBySpecializationIdMutation(
         cookies.Access_token,
@@ -63,7 +63,7 @@ const AppointmentPage = () => {
     );
 
   const {
-    mutate: mutateGetFreeAppointments,
+    mutate: MutateGetFreeAppointments,
     isLoading: getFreeAppointmentsIsLoading,
   } = useMutation(
     GetFreeAppointmentsMutation(cookies.Access_token, doctor.id, (res) => {
@@ -78,7 +78,7 @@ const AppointmentPage = () => {
     })
   );
 
-  const { mutate: mutateMakeAppointment } = useMutation(
+  const { mutate: MutateMakeAppointment } = useMutation(
     MakeAppointmentMutation(
       cookies.Access_token,
       filteredTickets[ticketId],
@@ -91,15 +91,16 @@ const AppointmentPage = () => {
   useEffect(() => {
     switch (step) {
       case 1:
-        mutateGetSpecializations();
+        MutateGetSpecializations();
         break;
       case 2:
-        mutateGetDoctors();
+        MutateGetDoctors();
         break;
       case 3:
-        mutateGetFreeAppointments();
+        MutateGetFreeAppointments();
         break;
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [step]);
 
   const filterTickets = (tickets: Ticket[], date: Date) => {
@@ -277,7 +278,7 @@ const AppointmentPage = () => {
                     label="Записаться"
                     width="calc(100% - 115px)"
                     onClick={() => {
-                      mutateMakeAppointment();
+                      MutateMakeAppointment();
                     }}
                   />
                 </div>

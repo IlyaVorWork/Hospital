@@ -37,7 +37,7 @@ const DoctorCard = ({
 }: DoctorCardProps) => {
   return (
     <div className="card" onClick={onClick}>
-      <img src={url} alt="Doctor's photo" className="doctorImg" />
+      <img src={url} alt="Doctor" className="doctorImg" />
       <span>{doctorName}</span>
       <span>Талонов: {ticketCount}</span>
     </div>

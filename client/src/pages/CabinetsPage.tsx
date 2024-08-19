@@ -111,6 +111,7 @@ const CabinetPage = () => {
         MutateGetCabinets();
         break;
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [action]);
 
   const currentAction = () => {

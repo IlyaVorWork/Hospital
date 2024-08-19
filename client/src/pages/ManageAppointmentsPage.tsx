@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import Button from "../stories/button/Button";
 import Select, { SelectOption } from "../stories/select/Select";
 import { useMutation } from "react-query";
 import { useCookies } from "react-cookie";
@@ -69,10 +68,12 @@ const ManageAppointmentsPage = () => {
 
   useEffect(() => {
     MutateGetPatients();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
     MutateGetAppointmentsByPatientId();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [patient]);
 
   const showAppointments = () => {
@@ -81,7 +82,7 @@ const ManageAppointmentsPage = () => {
         <InfoCard text="Выберите пациента для отображения активных записей" />
       );
     }
-    if (appointments.length == 0) {
+    if (appointments.length === 0) {
       return <InfoCard text="У этого пациента нет активных записей" />;
     }
     return (

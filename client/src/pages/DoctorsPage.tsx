@@ -122,6 +122,7 @@ const DoctorsPage = () => {
         MutateGetDoctors();
         break;
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [action]);
 
   const currentAction = () => {

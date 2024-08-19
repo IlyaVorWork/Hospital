@@ -2,11 +2,12 @@ import { ReactElement, useEffect, useState } from "react";
 import "./layout.css";
 import { useCookies } from "react-cookie";
 import { jwtDecode } from "jwt-decode";
-import { useLocation, useMatches, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { ReactNotifications } from "react-notifications-component";
 import "react-notifications-component/dist/theme.css";
 import { ButtonProps } from "../button/Button";
 import Header from "../header/Header";
+import { TokenClaims } from "../../types/Auth.types";
 
 interface LayoutProps {
   children: ReactElement;
@@ -17,20 +18,10 @@ interface IMenuMap {
   admin: ButtonProps[];
 }
 
-type role = "admin" | "patient";
-
-export type AccessTokenPayload = {
-  exp: number;
-  id: number;
-  login: role;
-  role: string;
-};
-
 const Layout = ({ children, ...props }: LayoutProps) => {
-  const [accessToken, _, removeAcccessToken] = useCookies(["Access_token"]);
+  const [accessToken, , removeAcccessToken] = useCookies(["Access_token"]);
   const navigate = useNavigate();
   const location = useLocation();
-  const matches = useMatches();
 
   let currentPath = location.pathname.split("/").pop();
 
@@ -123,16 +114,19 @@ const Layout = ({ children, ...props }: LayoutProps) => {
     document.title = currentPath![0].toUpperCase() + currentPath?.slice(1);
 
     if (accessToken.Access_token) {
-      const decodedToken: AccessTokenPayload = jwtDecode(
-        accessToken.Access_token
-      );
+      const decodedToken: TokenClaims = jwtDecode(accessToken.Access_token);
       if (decodedToken.role === "admin") {
         setMenu(headerButtons.admin);
       } else {
         setMenu(headerButtons.patient);
       }
     }
-  }, []);
+  }, [
+    accessToken.Access_token,
+    currentPath,
+    headerButtons.admin,
+    headerButtons.patient,
+  ]);
 
   return (
     <>

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import "./appointmentCard.css";
 import { ReactComponent as DownArrow } from "../assets/down-arrow.svg";
 import DualTextCard from "../dualTextCard/DualTextCard";
@@ -63,7 +63,7 @@ const AppointmentCard = ({
         <DownArrow className="appointmentDownArrow" />
       </div>
       <div className="infoCard">
-        <img src={url} alt="Doctor's photo" className="doctorImg" />
+        <img src={url} alt="Doctor" className="doctorImg" />
         <div className="infoContainer">
           <DualTextCard leftContent="ФИО" rightContent={fullName} />
           <DualTextCard

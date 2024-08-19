@@ -2,8 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useMutation } from "react-query";
 import { useLocation } from "react-router-dom";
 import { useCookies } from "react-cookie";
-import { Store } from "react-notifications-component";
-import { Patient, TokenClaims } from "../types/Auth.types";
+import { Patient } from "../types/Auth.types";
 import { Appointment } from "../types/Appointment.types";
 import {
   ChangePasswordMutation,
@@ -13,10 +12,7 @@ import {
   CancelAppointmentMutation,
   GetAppointmentsByPatientIdMutation,
 } from "../queries/Appointment.queries";
-import {
-  CallErrorNotification,
-  CallSuccessNotification,
-} from "../utils/NotificationCall";
+import { CallSuccessNotification } from "../utils/NotificationCall";
 import Loading from "../stories/loading/Loading";
 import InfoCard from "../stories/infoCard/InfoCard";
 import DualTextCard from "../stories/dualTextCard/DualTextCard";
@@ -99,10 +95,11 @@ const ProfilePage = () => {
 
   useEffect(() => {
     if (state) {
+      console.log("Биба");
       setPart(state.part);
       CallSuccessNotification("Вы были успешно записаны на приём");
     }
-  }, []);
+  }, [state]);
 
   useEffect(() => {
     switch (part) {
@@ -114,12 +111,14 @@ const ProfilePage = () => {
         setNewPasswordCopy("");
         break;
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [part]);
 
   useEffect(() => {
     if (part === "appointments" && patient.id) {
       MutateGetAppointmentsByPatientId();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [part, patient]);
 
   const partContent = () => {
@@ -196,7 +195,7 @@ const ProfilePage = () => {
           return <Loading />;
         }
 
-        if (appointments.length == 0) {
+        if (appointments.length === 0) {
           return <InfoCard text="В данный момент у Вас нет активных записей" />;
         }
 

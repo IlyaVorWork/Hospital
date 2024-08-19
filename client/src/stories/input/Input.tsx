@@ -42,62 +42,60 @@ const Input = ({
   onChange,
   ...props
 }: InputProps) => {
-  {
-    let isInvalid = invalid ? "invalid" : "";
-    switch (type) {
-      case "password":
-        return (
-          <div className={["input", isInvalid].join(" ")}>
+  let isInvalid = invalid ? "invalid" : "";
+  switch (type) {
+    case "password":
+      return (
+        <div className={["input", isInvalid].join(" ")}>
+          <input
+            type="password"
+            placeholder={placeholder}
+            onChange={onChange}
+            value={value}
+          />
+        </div>
+      );
+    case "date":
+      return (
+        <div className="input">
+          <input
+            type="date"
+            onChange={onChange}
+            value={
+              value && typeof value != "string"
+                ? value?.toISOString().split("T")[0]
+                : ""
+            }
+            //min={new Date().toISOString().split("T")[0]}
+          />
+        </div>
+      );
+    case "checkbox":
+      return (
+        <div className="input">
+          <div className="checkbox">
             <input
-              type="password"
-              placeholder={placeholder}
-              onChange={onChange}
+              type="checkbox"
               value={value}
-            />
-          </div>
-        );
-      case "date":
-        return (
-          <div className="input">
-            <input
-              type="date"
+              name={value}
+              checked={isChecked}
               onChange={onChange}
-              value={
-                value && typeof value != "string"
-                  ? value?.toISOString().split("T")[0]
-                  : ""
-              }
-              //min={new Date().toISOString().split("T")[0]}
             />
+            <label htmlFor={value}>{placeholder}</label>
           </div>
-        );
-      case "checkbox":
-        return (
-          <div className="input">
-            <div className="checkbox">
-              <input
-                type="checkbox"
-                value={value}
-                name={value}
-                checked={isChecked}
-                onChange={onChange}
-              />
-              <label htmlFor={value}>{placeholder}</label>
-            </div>
-          </div>
-        );
-      case "text":
-        return (
-          <div className={["input", isInvalid].join(" ")}>
-            <input
-              type="text"
-              placeholder={placeholder}
-              onChange={onChange}
-              value={value}
-            />
-          </div>
-        );
-    }
+        </div>
+      );
+    case "text":
+      return (
+        <div className={["input", isInvalid].join(" ")}>
+          <input
+            type="text"
+            placeholder={placeholder}
+            onChange={onChange}
+            value={value}
+          />
+        </div>
+      );
   }
 };
 
