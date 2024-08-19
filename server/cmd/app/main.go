@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"os"
 	"server/internal/api"
 	"server/internal/repositories"
 	"server/internal/service"
@@ -22,7 +23,9 @@ func main() {
 	}
 
 	r := gin.Default()
-	
+	APP_IP, _ := os.LookupEnv("APP_IP")
+    APP_PORT, _ := os.LookupEnv("APP_PORT")
+
 	db := repositories.ConnectDB()
 
 	authRepo := repositories.NewAuthRepository(db)
@@ -104,8 +107,5 @@ func main() {
 		appointment.PATCH("/cancelAppointment", appointmentHandler.CancelAppointment)
 	}
 
-	err := r.Run()
-	if err != nil {
-		panic(err)
-	}
+	r.Run(APP_IP+":"+APP_PORT)
 }
